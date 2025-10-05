@@ -597,6 +597,20 @@ function App() {
               </CardContent>
             </Card>
 
+            {/* Debug Info */}
+            {matchStatus && (
+              <Card className="mb-6 bg-slate-800/50 border-yellow-600/30">
+                <CardHeader>
+                  <CardTitle className="text-yellow-400">Debug Info</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <pre className="text-xs text-slate-300 whitespace-pre-wrap">
+                    {JSON.stringify(matchStatus, null, 2)}
+                  </pre>
+                </CardContent>
+              </Card>
+            )}
+
             {/* Opponent Information */}
             {matchStatus.status === "in_game" && matchStatus.data.opponent_data?.opponents && (
               <div className="space-y-6">
