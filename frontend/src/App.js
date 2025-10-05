@@ -312,9 +312,9 @@ function App() {
             }`}>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <span className="text-lg">⚔️</span>
+                  <span className="text-lg">🎯</span>
                   <span className="font-semibold text-white">
-                    {opponent.race} vs {playerData.race}
+                    {opponent.race} ПРОТИВ {playerData.race}
                   </span>
                 </div>
                 <div className="text-right">
@@ -322,10 +322,10 @@ function App() {
                     vsMyRaceStats.winrate >= 65 ? 'text-red-300' : 
                     vsMyRaceStats.winrate >= 50 ? 'text-yellow-300' : 'text-green-300'
                   }`}>
-                    {vsMyRaceStats.winrate}% винрейт
+                    {vsMyRaceStats.winrate}% против {playerData.race}
                   </div>
                   <div className="text-sm text-slate-300">
-                    {vsMyRaceStats.games} игр, {vsMyRaceStats.wins}/{vsMyRaceStats.losses} W/L
+                    {vsMyRaceStats.games} матчей против вас, {vsMyRaceStats.wins}W-{vsMyRaceStats.losses}L
                   </div>
                 </div>
               </div>
