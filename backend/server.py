@@ -159,23 +159,39 @@ def analyze_player_achievements(basic_stats: dict, hero_stats: dict, recent_matc
             games_count = hero_games[main_hero]
             
             # Hero-specific achievements
+            # Map heroes to races for filtering
+            heroes_by_race = {
+                "Human": ["archmage", "mountainking", "paladin", "bloodmage"],
+                "Orc": ["blademaster", "farseer", "taurenchieftain", "shadowhunter"], 
+                "Night Elf": ["demonhunter", "keeperofthegrove", "moonpriestess", "warden", "bansheeranger"],
+                "Undead": ["deathknight", "dreadlord", "lich", "cryptlord"],
+                "Random": []  # Random can use any heroes
+            }
+            
             hero_achievements = {
                 "demonhunter": "🦸 Я и есть демон хантер",
                 "blademaster": "🥷 Мастер бамбука", 
                 "mountainking": "⛵ Горный корабль",
                 "archmage": "🧙 Мастер магии",
                 "paladin": "⚔️ Светлый рыцарь",
+                "bloodmage": "🩸 Кровавый маг",
                 "farseer": "👁️ Дальновидец",
                 "taurenchieftain": "🐂 Вождь племени",
                 "shadowhunter": "🏹 Охотник теней",
                 "keeperofthegrove": "🌳 Хранитель рощи",
                 "moonpriestess": "🌙 Лунная жрица",
                 "warden": "🦉 Стражница",
-                "deathknight": "💀 Рыцарь смерти",
+                "bansheeranger": "👻 Банши-рейнджер",
+                "deathknight": "💀 Коил и ты труп",
                 "dreadlord": "👹 Повелитель ужаса",
                 "lich": "❄️ Король-лич",
                 "cryptlord": "🕷️ Повелитель склепов"
             }
+            
+            # Filter heroes by player's race
+            valid_heroes = heroes_by_race.get(player_race, [])
+            if player_race == "Random":
+                valid_heroes = list(hero_achievements.keys())  # Random can use all heroes
             
             if main_hero in hero_achievements and games_count >= 10:
                 achievements.append({
