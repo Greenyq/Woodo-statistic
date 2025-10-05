@@ -109,13 +109,16 @@ function App() {
   };
 
   const showDemoMatch = () => {
+    console.log('Demo button clicked');
+    
     // Set form data for demo
     const demoPlayerData = {
       nickname: "DemoPlayer",
-      battle_tag: "DemoPlayer#1234", 
+      battle_tag: "Clover#21325", // Real player with stats
       race: "Human"
     };
     
+    console.log('Setting demo player data:', demoPlayerData);
     setPlayerData(demoPlayerData);
     
     // Demo data to show what happens when a match is found
