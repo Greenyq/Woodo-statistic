@@ -251,26 +251,34 @@ function App() {
   const OpponentCard = ({ opponent }) => {
     const playerRaceNum = getPlayerRaceNumber();
     
-    // Calculate opponent's TOTAL winrate AGAINST my race from hero stats
+    // Calculate opponent's TOTAL winrate AGAINST my race from hero stats (filtered by opponent's race)
     const getOpponentWinrateVsMyRace = () => {
       if (!opponent.hero_stats?.heroStatsItemList) return null;
       
       let totalWins = 0;
       let totalLosses = 0;
       
-      // Sum up all hero stats against my race
-      opponent.hero_stats.heroStatsItemList.forEach(heroStat => {
-        heroStat.stats?.forEach(stat => {
-          const overall = stat.winLossesOnMap?.find(wl => wl.map === "Overall");
-          if (overall) {
-            const vsMyRace = overall.winLosses?.find(wl => wl.race === playerRaceNum);
-            if (vsMyRace && vsMyRace.games > 0) {
-              totalWins += vsMyRace.wins;
-              totalLosses += vsMyRace.losses;
+      // Get heroes of opponent's race
+      const opponentRaceHeroes = getHeroesByRace(opponent.race);
+      
+      // Sum up hero stats against my race, but only for opponent's race heroes
+      opponent.hero_stats.heroStatsItemList
+        .filter(heroStat => {
+          // Filter: only include heroes of opponent's race (or all if Random)
+          return opponent.race === "Random" || opponentRaceHeroes.includes(heroStat.heroId);
+        })
+        .forEach(heroStat => {
+          heroStat.stats?.forEach(stat => {
+            const overall = stat.winLossesOnMap?.find(wl => wl.map === "Overall");
+            if (overall) {
+              const vsMyRace = overall.winLosses?.find(wl => wl.race === playerRaceNum);
+              if (vsMyRace && vsMyRace.games > 0) {
+                totalWins += vsMyRace.wins;
+                totalLosses += vsMyRace.losses;
+              }
             }
-          }
+          });
         });
-      });
       
       const totalGames = totalWins + totalLosses;
       if (totalGames === 0) return null;
