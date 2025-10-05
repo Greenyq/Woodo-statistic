@@ -269,7 +269,7 @@ async def get_demo_match():
                     "opponents": [
                         {
                             "battle_tag": demo_battle_tag,
-                            "race": "Night Elf",
+                            "race": "Undead",
                             "basic_stats": opponent_basic_stats,
                             "race_stats": opponent_race_stats,
                             "recent_matches": opponent_matches,
