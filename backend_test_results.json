@@ -1,0 +1,142 @@
+{
+  "summary": {
+    "tests_run": 22,
+    "tests_passed": 21,
+    "success_rate": 95.45454545454545,
+    "timestamp": "2025-10-05T16:05:02.020775"
+  },
+  "test_results": [
+    {
+      "test_name": "API Root",
+      "success": true,
+      "details": "Status: 200, Response keys: ['message']",
+      "timestamp": "2025-10-05T16:04:56.392900"
+    },
+    {
+      "test_name": "Check Match - Valid Input",
+      "success": true,
+      "details": "Status: 200, Response keys: ['status', 'message', 'data']",
+      "timestamp": "2025-10-05T16:04:56.992283"
+    },
+    {
+      "test_name": "Player Stats",
+      "success": true,
+      "details": "Status: 200, Response keys: ['battle_tag', 'statistics', 'recent_matches']",
+      "timestamp": "2025-10-05T16:04:57.795183"
+    },
+    {
+      "test_name": "Match History",
+      "success": false,
+      "details": "Expected 200, got 500. Response: Internal Server Error...",
+      "timestamp": "2025-10-05T16:04:57.834239"
+    },
+    {
+      "test_name": "Check Match - Invalid Battle Tag",
+      "success": true,
+      "details": "Status: 422, Response keys: ['detail']",
+      "timestamp": "2025-10-05T16:04:57.867235"
+    },
+    {
+      "test_name": "Check Match - Invalid Race",
+      "success": true,
+      "details": "Status: 422, Response keys: ['detail']",
+      "timestamp": "2025-10-05T16:04:57.906642"
+    },
+    {
+      "test_name": "Check Match - Missing Fields",
+      "success": true,
+      "details": "Status: 422, Response keys: ['detail']",
+      "timestamp": "2025-10-05T16:04:57.939414"
+    },
+    {
+      "test_name": "Race Validation - Human",
+      "success": true,
+      "details": "Status: 200, Response keys: ['status', 'message', 'data']",
+      "timestamp": "2025-10-05T16:04:58.391168"
+    },
+    {
+      "test_name": "Race Validation - Orc",
+      "success": true,
+      "details": "Status: 200, Response keys: ['status', 'message', 'data']",
+      "timestamp": "2025-10-05T16:04:58.814681"
+    },
+    {
+      "test_name": "Race Validation - Night Elf",
+      "success": true,
+      "details": "Status: 200, Response keys: ['status', 'message', 'data']",
+      "timestamp": "2025-10-05T16:04:59.233949"
+    },
+    {
+      "test_name": "Race Validation - Undead",
+      "success": true,
+      "details": "Status: 200, Response keys: ['status', 'message', 'data']",
+      "timestamp": "2025-10-05T16:04:59.693628"
+    },
+    {
+      "test_name": "Race Validation - Random",
+      "success": true,
+      "details": "Status: 200, Response keys: ['status', 'message', 'data']",
+      "timestamp": "2025-10-05T16:05:00.104507"
+    },
+    {
+      "test_name": "Battle Tag Format - Valid 4-digit",
+      "success": true,
+      "details": "Status: 200, Response keys: ['status', 'message', 'data']",
+      "timestamp": "2025-10-05T16:05:00.522632"
+    },
+    {
+      "test_name": "Battle Tag Format - Valid 5-digit",
+      "success": true,
+      "details": "Status: 200, Response keys: ['status', 'message', 'data']",
+      "timestamp": "2025-10-05T16:05:00.951093"
+    },
+    {
+      "test_name": "Battle Tag Format - Valid with numbers",
+      "success": true,
+      "details": "Status: 200, Response keys: ['status', 'message', 'data']",
+      "timestamp": "2025-10-05T16:05:01.357919"
+    },
+    {
+      "test_name": "Battle Tag Format - No # symbol",
+      "success": true,
+      "details": "Status: 422, Response keys: ['detail']",
+      "timestamp": "2025-10-05T16:05:01.412207"
+    },
+    {
+      "test_name": "Battle Tag Format - 3 digits",
+      "success": true,
+      "details": "Status: 422, Response keys: ['detail']",
+      "timestamp": "2025-10-05T16:05:01.445041"
+    },
+    {
+      "test_name": "Battle Tag Format - 6 digits",
+      "success": true,
+      "details": "Status: 422, Response keys: ['detail']",
+      "timestamp": "2025-10-05T16:05:01.479776"
+    },
+    {
+      "test_name": "Battle Tag Format - Non-numeric after #",
+      "success": true,
+      "details": "Status: 422, Response keys: ['detail']",
+      "timestamp": "2025-10-05T16:05:01.514195"
+    },
+    {
+      "test_name": "Battle Tag Format - Empty string",
+      "success": true,
+      "details": "Status: 422, Response keys: ['detail']",
+      "timestamp": "2025-10-05T16:05:01.547683"
+    },
+    {
+      "test_name": "Battle Tag Format - No digits after #",
+      "success": true,
+      "details": "Status: 422, Response keys: ['detail']",
+      "timestamp": "2025-10-05T16:05:01.577682"
+    },
+    {
+      "test_name": "W3Champions Integration",
+      "success": true,
+      "details": "Status: 200, Response keys: ['status', 'message', 'data']",
+      "timestamp": "2025-10-05T16:05:02.019832"
+    }
+  ]
+}
