@@ -39,8 +39,9 @@ class PlayerInput(BaseModel):
     
     @validator('battle_tag')
     def validate_battle_tag(cls, v):
-        if not re.match(r'^[a-zA-Z0-9]+#\d{4,5}$', v):
-            raise ValueError('Battle tag must be in format PlayerName#1234')
+        # Updated regex to support Cyrillic characters and more international characters
+        if not re.match(r'^[\w\u0400-\u04FF\u0500-\u052F]+#\d{4,5}$', v, re.UNICODE):
+            raise ValueError('Battle tag must be in format PlayerName#1234 (supports international characters)')
         return v
 
 class MatchStatus(BaseModel):
