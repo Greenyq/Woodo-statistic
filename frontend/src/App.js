@@ -598,16 +598,18 @@ function App() {
               </CardContent>
             </Card>
 
-            {/* Debug Info */}
-            {matchStatus && (
+            {/* Opponent Data Debug */}
+            {matchStatus && matchStatus.data.opponent_data && (
               <Card className="mb-6 bg-slate-800/50 border-yellow-600/30">
                 <CardHeader>
-                  <CardTitle className="text-yellow-400">Debug Info</CardTitle>
+                  <CardTitle className="text-yellow-400">Opponents Found: {matchStatus.data.opponent_data.opponents?.length || 0}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <pre className="text-xs text-slate-300 whitespace-pre-wrap">
-                    {JSON.stringify(matchStatus, null, 2)}
-                  </pre>
+                  <div className="text-sm text-slate-300">
+                    Status: {matchStatus.status}<br/>
+                    Has opponents: {matchStatus.data.opponent_data?.opponents ? 'Yes' : 'No'}<br/>
+                    Opponents count: {matchStatus.data.opponent_data?.opponents?.length || 0}
+                  </div>
                 </CardContent>
               </Card>
             )}
