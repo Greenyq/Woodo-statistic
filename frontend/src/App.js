@@ -154,6 +154,66 @@ function App() {
                     heroUsed: "Blademaster"
                   }
                 ]
+              },
+              hero_stats: {
+                heroStatsItemList: [
+                  {
+                    heroId: "blademaster",
+                    stats: [
+                      {
+                        race: 1,
+                        winLossesOnMap: [
+                          {
+                            map: "Overall",
+                            winLosses: [
+                              {
+                                race: 1, // vs Human
+                                wins: 23,
+                                losses: 12,
+                                games: 35,
+                                winrate: 0.657
+                              }
+                            ]
+                          },
+                          {
+                            map: "2506221057LastRefugev1_5",
+                            winLosses: [
+                              {
+                                race: 1,
+                                wins: 8,
+                                losses: 2,
+                                games: 10,
+                                winrate: 0.8
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    heroId: "farseer",
+                    stats: [
+                      {
+                        race: 1,
+                        winLossesOnMap: [
+                          {
+                            map: "Overall",
+                            winLosses: [
+                              {
+                                race: 1,
+                                wins: 15,
+                                losses: 18,
+                                games: 33,
+                                winrate: 0.455
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
               }
             }
           ]
