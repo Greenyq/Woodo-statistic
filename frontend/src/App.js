@@ -113,25 +113,36 @@ function App() {
     }
   };
 
-  const showDemoMatch = () => {
-    console.log('Demo button clicked');
+  const showDemoMatch = async () => {
+    console.log('Demo button clicked - fetching real data');
+    setLoading(true);
     
-    // Set form data for demo - both React state and DOM directly
-    const demoPlayerData = {
-      nickname: "DemoPlayer",
-      battle_tag: "Clover#21325", // Real player with stats
-      race: "Human"
-    };
-    
-    console.log('Setting demo player data:', demoPlayerData);
-    
-    // Set React state
-    setPlayerData(demoPlayerData);
-    
-    // Also set DOM values directly as fallback
-    if (nicknameRef.current) nicknameRef.current.value = demoPlayerData.nickname;
-    if (battleTagRef.current) battleTagRef.current.value = demoPlayerData.battle_tag;
-    if (raceRef.current) raceRef.current.value = demoPlayerData.race;
+    try {
+      // Set form data for demo
+      const demoPlayerData = {
+        nickname: "DemoPlayer", 
+        battle_tag: "DemoPlayer#1234",
+        race: "Human"
+      };
+      
+      setPlayerData(demoPlayerData);
+      
+      // Also set DOM values directly
+      if (nicknameRef.current) nicknameRef.current.value = demoPlayerData.nickname;
+      if (battleTagRef.current) battleTagRef.current.value = demoPlayerData.battle_tag;
+      if (raceRef.current) raceRef.current.value = demoPlayerData.race;
+      
+      // Fetch real demo match data from backend
+      const response = await axios.get(`${API}/demo-match`);
+      setMatchStatus(response.data);
+      setLastChecked(new Date());
+      
+    } catch (err) {
+      console.error("Error fetching demo match:", err);
+      setError("Failed to load demo match data");
+    } finally {
+      setLoading(false);
+    }
     
     // Demo data to show what happens when a match is found
     const demoMatchData = {
