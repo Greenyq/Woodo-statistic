@@ -116,7 +116,7 @@ function App() {
   const showDemoMatch = () => {
     console.log('Demo button clicked');
     
-    // Set form data for demo
+    // Set form data for demo - both React state and DOM directly
     const demoPlayerData = {
       nickname: "DemoPlayer",
       battle_tag: "Clover#21325", // Real player with stats
@@ -124,7 +124,14 @@ function App() {
     };
     
     console.log('Setting demo player data:', demoPlayerData);
+    
+    // Set React state
     setPlayerData(demoPlayerData);
+    
+    // Also set DOM values directly as fallback
+    if (nicknameRef.current) nicknameRef.current.value = demoPlayerData.nickname;
+    if (battleTagRef.current) battleTagRef.current.value = demoPlayerData.battle_tag;
+    if (raceRef.current) raceRef.current.value = demoPlayerData.race;
     
     // Demo data to show what happens when a match is found
     const demoMatchData = {
