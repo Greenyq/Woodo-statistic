@@ -135,13 +135,6 @@ function App() {
                 battleTag: "ProGamer#5678",
                 winLosses: [
                   {
-                    race: 1,
-                    wins: 127,
-                    losses: 89,
-                    games: 216,
-                    winrate: 0.588
-                  },
-                  {
                     race: 2,
                     wins: 89,
                     losses: 65,
@@ -153,6 +146,9 @@ function App() {
               race_stats: [
                 {
                   race: 2,
+                  gateWay: 20,
+                  season: 22,
+                  battleTag: "ProGamer#5678",
                   wins: 89,
                   losses: 65,
                   games: 154,
