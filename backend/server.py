@@ -85,7 +85,12 @@ async def check_ongoing_match(battle_tag: str) -> Optional[Dict]:
 
 async def get_player_statistics(battle_tag: str) -> Optional[Dict]:
     """Get player statistics"""
-    endpoint = f"players/{battle_tag}/race-stats"
+    endpoint = f"players/{battle_tag}"
+    return await get_w3c_data(endpoint)
+
+async def get_player_race_stats(battle_tag: str, gateway: int = 20, season: int = 22) -> Optional[Dict]:
+    """Get player race statistics with detailed breakdown"""
+    endpoint = f"players/{battle_tag}/race-stats?gateWay={gateway}&season={season}"
     return await get_w3c_data(endpoint)
 
 async def get_player_hero_stats(battle_tag: str, season: int = 22) -> Optional[Dict]:
