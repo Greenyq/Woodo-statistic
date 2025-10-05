@@ -136,6 +136,118 @@ def get_race_name(race_number: int) -> str:
     }
     return race_map.get(race_number, "Unknown")
 
+def analyze_player_achievements(basic_stats: dict, hero_stats: dict, recent_matches: dict) -> list:
+    """Analyze player data and return list of achievements/badges"""
+    achievements = []
+    
+    # 1. HERO MAIN ACHIEVEMENTS
+    if hero_stats and hero_stats.get('heroStatsItemList'):
+        # Find most played hero by total games
+        hero_games = {}
+        for hero_stat in hero_stats['heroStatsItemList']:
+            total_games = 0
+            for stat in hero_stat.get('stats', []):
+                for map_stat in stat.get('winLossesOnMap', []):
+                    if map_stat.get('map') == 'Overall':
+                        for win_loss in map_stat.get('winLosses', []):
+                            total_games += win_loss.get('games', 0)
+            if total_games > 0:
+                hero_games[hero_stat['heroId']] = total_games
+        
+        if hero_games:
+            main_hero = max(hero_games, key=hero_games.get)
+            games_count = hero_games[main_hero]
+            
+            # Hero-specific achievements
+            hero_achievements = {
+                "demonhunter": "🦸 Я и есть демон хантер",
+                "blademaster": "🥷 Мастер бамбука", 
+                "mountainking": "⛵ Горный корабль",
+                "archmage": "🧙 Мастер магии",
+                "paladin": "⚔️ Светлый рыцарь",
+                "farseer": "👁️ Дальновидец",
+                "taurenchieftain": "🐂 Вождь племени",
+                "shadowhunter": "🏹 Охотник теней",
+                "keeperofthegrove": "🌳 Хранитель рощи",
+                "moonpriestess": "🌙 Лунная жрица",
+                "warden": "🦉 Стражница",
+                "deathknight": "💀 Рыцарь смерти",
+                "dreadlord": "👹 Повелитель ужаса",
+                "lich": "❄️ Король-лич",
+                "cryptlord": "🕷️ Повелитель склепов"
+            }
+            
+            if main_hero in hero_achievements and games_count >= 10:
+                achievements.append({
+                    "title": hero_achievements[main_hero],
+                    "description": f"Основной герой: {games_count} игр",
+                    "type": "hero",
+                    "color": "blue"
+                })
+    
+    # 2. WIN/LOSS STREAK ACHIEVEMENTS  
+    if recent_matches and recent_matches.get('matches'):
+        matches = recent_matches['matches']
+        if len(matches) >= 3:
+            # Check last 3 matches for streaks
+            last_3 = [match.get('won', False) for match in matches[:3]]
+            
+            if all(last_3):  # 3 wins in a row
+                achievements.append({
+                    "title": "🔥 Я в огне!",
+                    "description": "3 победы подряд",
+                    "type": "streak",
+                    "color": "red"
+                })
+            elif not any(last_3):  # 3 losses in a row
+                achievements.append({
+                    "title": "😤 Это все интернет!",
+                    "description": "3 поражения подряд", 
+                    "type": "streak",
+                    "color": "gray"
+                })
+    
+    # 3. ACTIVITY ACHIEVEMENTS
+    if recent_matches and recent_matches.get('matches'):
+        from datetime import datetime, timezone, timedelta
+        today = datetime.now(timezone.utc).date()
+        
+        # Check if player played today (if we had match timestamps)
+        # For now, if no recent matches, assume inactive
+        if len(recent_matches['matches']) == 0:
+            achievements.append({
+                "title": "😴 Только проснулся",
+                "description": "Давно не играл",
+                "type": "activity", 
+                "color": "yellow"
+            })
+    
+    # 4. ECONOMIC ACHIEVEMENTS (placeholder - would need detailed match data)
+    # This would require match replay data which might not be available
+    # For now, add some fun achievements based on win rates
+    if basic_stats and basic_stats.get('winLosses'):
+        total_wins = sum(wl.get('wins', 0) for wl in basic_stats['winLosses'])
+        total_games = sum(wl.get('games', 0) for wl in basic_stats['winLosses']) 
+        
+        if total_games > 0:
+            winrate = total_wins / total_games
+            if winrate >= 0.7:
+                achievements.append({
+                    "title": "💎 Элитный игрок", 
+                    "description": f"Винрейт {int(winrate * 100)}%",
+                    "type": "skill",
+                    "color": "purple"
+                })
+            elif winrate <= 0.3:
+                achievements.append({
+                    "title": "🔰 Новичок",
+                    "description": f"Винрейт {int(winrate * 100)}%", 
+                    "type": "skill",
+                    "color": "green"
+                })
+    
+    return achievements
+
 # Routes
 @api_router.get("/")
 async def root():
