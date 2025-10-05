@@ -229,6 +229,53 @@ async def get_match_history():
         logging.error(f"Error getting match history: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Error getting match history: {str(e)}")
 
+@api_router.get("/demo-match")
+async def get_demo_match():
+    """Get demo match data with real W3Champions statistics"""
+    try:
+        # Use real player with actual stats
+        demo_battle_tag = "Clover#21325"
+        
+        # Get real opponent statistics
+        opponent_basic_stats = await get_player_statistics(demo_battle_tag)
+        opponent_race_stats = await get_player_race_stats(demo_battle_tag)
+        opponent_matches = await search_matches(demo_battle_tag, 0, 10)
+        opponent_hero_stats = await get_player_hero_stats(demo_battle_tag)
+        
+        demo_match_data = {
+            "status": "in_game",
+            "message": f"Demo match found! Player DemoPlayer#1234 vs {demo_battle_tag}",
+            "data": {
+                "id": "demo-match-real",
+                "battle_tag": "DemoPlayer#1234",
+                "is_in_game": True,
+                "match_data": {
+                    "id": "demo-match-real",
+                    "map": "ConcealedHill",
+                    "matchType": "1v1"
+                },
+                "opponent_data": {
+                    "opponents": [
+                        {
+                            "battle_tag": demo_battle_tag,
+                            "race": "Human",
+                            "basic_stats": opponent_basic_stats,
+                            "race_stats": opponent_race_stats,
+                            "recent_matches": opponent_matches,
+                            "hero_stats": opponent_hero_stats
+                        }
+                    ]
+                },
+                "timestamp": datetime.now(timezone.utc).isoformat()
+            }
+        }
+        
+        return demo_match_data
+        
+    except Exception as e:
+        logging.error(f"Error getting demo match: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error getting demo match: {str(e)}")
+
 # Include the router in the main app
 app.include_router(api_router)
 
