@@ -470,25 +470,19 @@ function App() {
             </div>
             <div className="space-y-2">
               <Label className="text-slate-200">Race</Label>
-              <Select
+              <select
+                data-testid="race-selector"
                 value={playerData.race}
-                onValueChange={(value) => handleInputChange("race", value)}
+                onChange={(e) => handleInputChange("race", e.target.value)}
+                className="w-full bg-slate-700 border border-slate-600 text-white rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-amber-600"
               >
-                <SelectTrigger data-testid="race-selector" className="bg-slate-700 border-slate-600 text-white">
-                  <SelectValue placeholder="Select your race" />
-                </SelectTrigger>
-                <SelectContent className="bg-slate-800 border-slate-600">
-                  {races.map(race => (
-                    <SelectItem 
-                      key={race.value} 
-                      value={race.value}
-                      className="text-white hover:bg-slate-700"
-                    >
-                      {race.icon} {race.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                <option value="">Select your race</option>
+                {races.map(race => (
+                  <option key={race.value} value={race.value}>
+                    {race.icon} {race.label}
+                  </option>
+                ))}
+              </select>
             </div>
 
             {error && (
