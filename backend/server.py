@@ -400,7 +400,8 @@ async def get_demo_match():
                             "basic_stats": opponent_basic_stats,
                             "race_stats": opponent_race_stats,
                             "recent_matches": opponent_matches,
-                            "hero_stats": opponent_hero_stats
+                            "hero_stats": opponent_hero_stats,
+                            "achievements": opponent_achievements
                         }
                     ]
                 },
