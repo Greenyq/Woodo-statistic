@@ -293,13 +293,21 @@ async def check_player_match(player_input: PlayerInput):
                         opponent_matches = await search_matches(opponent_tag, 0, 20)
                         opponent_hero_stats = await get_player_hero_stats(opponent_tag)
                         
+                        # Analyze achievements
+                        opponent_achievements = analyze_player_achievements(
+                            opponent_basic_stats, 
+                            opponent_hero_stats, 
+                            opponent_matches
+                        )
+                        
                         opponents.append({
                             "battle_tag": opponent_tag,
                             "race": get_race_name(player.get("race", 16)),
                             "basic_stats": opponent_basic_stats,
                             "race_stats": opponent_race_stats,
                             "recent_matches": opponent_matches,
-                            "hero_stats": opponent_hero_stats
+                            "hero_stats": opponent_hero_stats,
+                            "achievements": opponent_achievements
                         })
         
         match_status = MatchStatus(
