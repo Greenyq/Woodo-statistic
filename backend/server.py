@@ -206,6 +206,10 @@ async def get_match_history():
     """Get stored match check history"""
     try:
         match_statuses = await db.match_statuses.find().sort("timestamp", -1).limit(50).to_list(50)
+        # Convert ObjectId to string for JSON serialization
+        for status in match_statuses:
+            if "_id" in status:
+                status["_id"] = str(status["_id"])
         return {"match_history": match_statuses}
     except Exception as e:
         logging.error(f"Error getting match history: {str(e)}")
