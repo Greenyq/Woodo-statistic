@@ -374,6 +374,52 @@ function App() {
               </span>
             </div>
           )}
+          
+          {/* ACHIEVEMENTS SECTION */}
+          {opponent.achievements && opponent.achievements.length > 0 && (
+            <div className="mt-4 p-3 rounded-lg bg-gradient-to-r from-amber-600/10 to-orange-600/10 border border-amber-600/30">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-lg">🏆</span>
+                <span className="font-semibold text-amber-300">Достижения игрока</span>
+              </div>
+              <div className="grid gap-2">
+                {opponent.achievements.map((achievement, idx) => (
+                  <div 
+                    key={idx} 
+                    className={`flex items-center justify-between p-2 rounded-md border-l-4 ${
+                      achievement.color === 'blue' ? 'bg-blue-600/10 border-blue-500' :
+                      achievement.color === 'red' ? 'bg-red-600/10 border-red-500' :
+                      achievement.color === 'purple' ? 'bg-purple-600/10 border-purple-500' :
+                      achievement.color === 'green' ? 'bg-green-600/10 border-green-500' :
+                      achievement.color === 'yellow' ? 'bg-yellow-600/10 border-yellow-500' :
+                      'bg-slate-600/10 border-slate-500'
+                    }`}
+                  >
+                    <div>
+                      <div className="font-medium text-white text-sm">
+                        {achievement.title}
+                      </div>
+                      <div className="text-xs text-slate-300">
+                        {achievement.description}
+                      </div>
+                    </div>
+                    <Badge 
+                      className={`text-xs ${
+                        achievement.color === 'blue' ? 'bg-blue-600/20 text-blue-300' :
+                        achievement.color === 'red' ? 'bg-red-600/20 text-red-300' :
+                        achievement.color === 'purple' ? 'bg-purple-600/20 text-purple-300' :
+                        achievement.color === 'green' ? 'bg-green-600/20 text-green-300' :
+                        achievement.color === 'yellow' ? 'bg-yellow-600/20 text-yellow-300' :
+                        'bg-slate-600/20 text-slate-300'
+                      }`}
+                    >
+                      {achievement.type}
+                    </Badge>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </CardHeader>
         <CardContent className="space-y-6">
           {/* Hero Statistics vs Your Race */}
