@@ -496,6 +496,7 @@ function App() {
                 <Label htmlFor="nickname" className="text-slate-200">Nickname</Label>
                 <Input
                   id="nickname"
+                  ref={nicknameRef}
                   data-testid="nickname-input"
                   placeholder="Enter your nickname"
                   value={playerData.nickname}
