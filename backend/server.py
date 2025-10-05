@@ -384,10 +384,12 @@ async def check_player_match(player_input: PlayerInput):
                         opponent_hero_stats = await get_player_hero_stats(opponent_tag)
                         
                         # Analyze achievements
+                        opponent_race = get_race_name(player.get("race", 16))
                         opponent_achievements = analyze_player_achievements(
                             opponent_basic_stats, 
                             opponent_hero_stats, 
-                            opponent_matches
+                            opponent_matches,
+                            opponent_race
                         )
                         
                         opponents.append({
