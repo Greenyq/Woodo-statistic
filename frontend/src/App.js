@@ -289,6 +289,8 @@ function App() {
   const OpponentCard = ({ opponent }) => {
     const playerRaceNum = getPlayerRaceNumber();
     
+    console.log("OpponentCard Debug:", { opponent, playerRaceNum, playerData });
+    
     return (
       <Card className="bg-slate-800/50 border-amber-600/30" data-testid={`opponent-card-${opponent.battle_tag}`}>
         <CardHeader className="pb-3">
