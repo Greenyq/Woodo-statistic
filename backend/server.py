@@ -222,29 +222,97 @@ def analyze_player_achievements(basic_stats: dict, hero_stats: dict, recent_matc
                 "color": "yellow"
             })
     
-    # 4. ECONOMIC ACHIEVEMENTS (placeholder - would need detailed match data)
-    # This would require match replay data which might not be available
-    # For now, add some fun achievements based on win rates
+    # 4. SKILL & EXPERIENCE ACHIEVEMENTS
     if basic_stats and basic_stats.get('winLosses'):
         total_wins = sum(wl.get('wins', 0) for wl in basic_stats['winLosses'])
         total_games = sum(wl.get('games', 0) for wl in basic_stats['winLosses']) 
         
         if total_games > 0:
             winrate = total_wins / total_games
-            if winrate >= 0.7:
+            
+            # Experience-based achievements
+            if total_games >= 1000:
                 achievements.append({
-                    "title": "💎 Элитный игрок", 
-                    "description": f"Винрейт {int(winrate * 100)}%",
+                    "title": "👑 Ветеран",
+                    "description": f"{total_games} игр сыграно",
+                    "type": "experience", 
+                    "color": "purple"
+                })
+            elif total_games >= 500:
+                achievements.append({
+                    "title": "🎖️ Опытный боец",
+                    "description": f"{total_games} игр сыграно",
+                    "type": "experience",
+                    "color": "blue"
+                })
+            
+            # Skill-based achievements  
+            if winrate >= 0.75 and total_games >= 100:
+                achievements.append({
+                    "title": "💎 Легенда",
+                    "description": f"Винрейт {int(winrate * 100)}% в {total_games} играх",
                     "type": "skill",
                     "color": "purple"
                 })
-            elif winrate <= 0.3:
+            elif winrate >= 0.6 and total_games >= 50:
                 achievements.append({
-                    "title": "🔰 Новичок",
-                    "description": f"Винрейт {int(winrate * 100)}%", 
-                    "type": "skill",
+                    "title": "⭐ Мастер",
+                    "description": f"Винрейт {int(winrate * 100)}%",
+                    "type": "skill", 
+                    "color": "blue"
+                })
+            elif winrate <= 0.35 and total_games >= 50:
+                achievements.append({
+                    "title": "😅 Учусь играть",
+                    "description": f"Винрейт {int(winrate * 100)}%, но не сдаюсь!",
+                    "type": "spirit",
                     "color": "green"
                 })
+    
+    # 5. RACE DIVERSITY ACHIEVEMENTS
+    if basic_stats and basic_stats.get('winLosses'):
+        races_played = [wl for wl in basic_stats['winLosses'] if wl.get('games', 0) >= 10]
+        if len(races_played) >= 4:
+            achievements.append({
+                "title": "🌈 Мульти-рейсер",
+                "description": f"Играет за {len(races_played)} рас",
+                "type": "diversity",
+                "color": "yellow"
+            })
+        elif len(races_played) == 1:
+            # Find the main race
+            main_race_num = races_played[0]['race']
+            race_names = {1: "Human", 2: "Orc", 4: "Night Elf", 8: "Undead", 0: "Random"}
+            race_name = race_names.get(main_race_num, "Unknown")
+            achievements.append({
+                "title": "🎯 Специалист",
+                "description": f"Играет только за {race_name}",
+                "type": "focus",
+                "color": "blue"
+            })
+    
+    # 6. FUN PERSONALITY ACHIEVEMENTS (based on patterns)
+    if recent_matches and recent_matches.get('matches'):
+        matches = recent_matches['matches']
+        if len(matches) >= 5:
+            # Check average game duration (if available)
+            durations = [match.get('durationInSeconds', 0) for match in matches[:5] if match.get('durationInSeconds')]
+            if durations:
+                avg_duration = sum(durations) / len(durations)
+                if avg_duration < 300:  # Less than 5 minutes
+                    achievements.append({
+                        "title": "⚡ Блицкригер",
+                        "description": "Быстрые игры в среднем",
+                        "type": "playstyle",
+                        "color": "red"
+                    })
+                elif avg_duration > 1800:  # More than 30 minutes  
+                    achievements.append({
+                        "title": "🐌 Стратег",
+                        "description": "Долгие обдуманные игры",
+                        "type": "playstyle", 
+                        "color": "blue"
+                    })
     
     return achievements
 
