@@ -116,30 +116,51 @@ function App() {
   const showDemoMatch = async () => {
     console.log('Demo button clicked - fetching real data');
     setLoading(true);
+    setError(""); // Clear any existing errors
     
     try {
-      // Set form data for demo
+      // FORCE React state update first
       const demoPlayerData = {
         nickname: "DemoPlayer", 
         battle_tag: "DemoPlayer#1234",
         race: "Human"
       };
       
-      setPlayerData(demoPlayerData);
+      // Force state update and wait for it
+      await new Promise((resolve) => {
+        setPlayerData(demoPlayerData);
+        setTimeout(resolve, 100); // Give React time to update
+      });
       
-      // Also set DOM values directly
-      if (nicknameRef.current) nicknameRef.current.value = demoPlayerData.nickname;
-      if (battleTagRef.current) battleTagRef.current.value = demoPlayerData.battle_tag;
-      if (raceRef.current) raceRef.current.value = demoPlayerData.race;
+      // FORCE DOM update as backup
+      setTimeout(() => {
+        if (nicknameRef.current) {
+          nicknameRef.current.value = demoPlayerData.nickname;
+          nicknameRef.current.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+        if (battleTagRef.current) {
+          battleTagRef.current.value = demoPlayerData.battle_tag;  
+          battleTagRef.current.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+        if (raceRef.current) {
+          raceRef.current.value = demoPlayerData.race;
+          raceRef.current.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+      }, 150);
       
       // Fetch real demo match data from backend
+      console.log('Fetching demo match data...');
       const response = await axios.get(`${API}/demo-match`);
+      console.log('Demo match data received:', response.data);
+      
       setMatchStatus(response.data);
       setLastChecked(new Date());
       
+      console.log('Demo match setup complete');
+      
     } catch (err) {
       console.error("Error fetching demo match:", err);
-      setError("Failed to load demo match data");
+      setError(`Failed to load demo match data: ${err.message}`);
     } finally {
       setLoading(false);
     }
