@@ -520,6 +520,7 @@ function App() {
             <div className="space-y-2">
               <Label className="text-slate-200">Race</Label>
               <select
+                ref={raceRef}
                 data-testid="race-selector"
                 value={playerData.race}
                 onChange={(e) => handleInputChange("race", e.target.value)}
