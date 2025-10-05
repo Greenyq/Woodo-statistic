@@ -136,7 +136,7 @@ def get_race_name(race_number: int) -> str:
     }
     return race_map.get(race_number, "Unknown")
 
-def analyze_player_achievements(basic_stats: dict, hero_stats: dict, recent_matches: dict) -> list:
+def analyze_player_achievements(basic_stats: dict, hero_stats: dict, recent_matches: dict, player_race: str = None) -> list:
     """Analyze player data and return list of achievements/badges"""
     achievements = []
     
