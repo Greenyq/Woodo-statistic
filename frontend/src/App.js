@@ -508,6 +508,7 @@ function App() {
                 <Label htmlFor="battle-tag" className="text-slate-200">Battle Tag</Label>
                 <Input
                   id="battle-tag"
+                  ref={battleTagRef}
                   data-testid="battle-tag-input"
                   placeholder="PlayerName#1234"
                   value={playerData.battle_tag}
