@@ -104,6 +104,12 @@ function App() {
   };
 
   const showDemoMatch = () => {
+    // Ensure form is filled for demo
+    if (!playerData.nickname || !playerData.battle_tag || !playerData.race) {
+      setError("Please fill in all fields before showing demo");
+      return;
+    }
+    
     // Demo data to show what happens when a match is found
     const demoMatchData = {
       status: "in_game",
