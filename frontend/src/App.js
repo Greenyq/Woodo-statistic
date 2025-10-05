@@ -648,11 +648,29 @@ function App() {
               </CardContent>
             </Card>
 
+            {/* Debug Match Status */}
+            {matchStatus && (
+              <Card className="mb-6 bg-slate-800/50 border-blue-600/30">
+                <CardHeader>
+                  <CardTitle className="text-blue-400">🔍 Debug: Match Status</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-sm text-slate-300 space-y-1">
+                    <div>Status: {matchStatus.status}</div>
+                    <div>Has data: {matchStatus.data ? 'Yes' : 'No'}</div>
+                    <div>Has opponent_data: {matchStatus.data?.opponent_data ? 'Yes' : 'No'}</div>
+                    <div>Has opponents: {matchStatus.data?.opponent_data?.opponents ? 'Yes' : 'No'}</div>
+                    <div>Opponents count: {matchStatus.data?.opponent_data?.opponents?.length || 0}</div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
             {/* Opponent Information */}
             {matchStatus && matchStatus.status === "in_game" && matchStatus.data && matchStatus.data.opponent_data && matchStatus.data.opponent_data.opponents && matchStatus.data.opponent_data.opponents.length > 0 && (
               <div className="space-y-6">
                 <div className="text-center">
-                  <h2 className="text-2xl font-bold text-amber-400 mb-2">Opponent Analysis</h2>
+                  <h2 className="text-2xl font-bold text-amber-400 mb-2">🎯 Анализ Противника - ПРОТИВ {playerData.race}</h2>
                   <Separator className="bg-amber-600/30" />
                 </div>
                 <div className="grid gap-6">
