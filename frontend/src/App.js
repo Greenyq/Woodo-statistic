@@ -392,18 +392,18 @@ function App() {
           )}
 
           {/* Overall Statistics */}
-          {opponent.statistics && (
+          {(opponent.basic_stats || opponent.race_stats) && (
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <div className="flex items-center gap-2 text-green-400">
                   <Trophy className="w-4 h-4" />
-                  <span className="text-sm">Overall Stats</span>
+                  <span className="text-sm">Race Statistics</span>
                 </div>
-                {opponent.statistics.raceStats?.map((stat, idx) => (
+                {opponent.basic_stats?.winLosses?.map((stat, idx) => (
                   <div key={idx} className="text-sm bg-slate-700/50 p-2 rounded">
                     <div className="flex justify-between">
-                      <span>{getRaceIcon(stat.race)} vs {playerData.race}</span>
-                      <span className="text-amber-300">{formatWinRate(stat.wins, stat.losses)}</span>
+                      <span>{getRaceIcon(get_race_name_from_number(stat.race))} {get_race_name_from_number(stat.race)}</span>
+                      <span className="text-amber-300">{Math.round(stat.winrate * 100)}%</span>
                     </div>
                     <div className="text-xs text-slate-400">
                       {stat.wins}W - {stat.losses}L ({stat.games} games)
