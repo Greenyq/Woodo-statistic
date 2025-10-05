@@ -373,6 +373,13 @@ async def get_demo_match():
         opponent_matches = await search_matches(demo_battle_tag, 0, 10)
         opponent_hero_stats = await get_player_hero_stats(demo_battle_tag)
         
+        # Analyze achievements
+        opponent_achievements = analyze_player_achievements(
+            opponent_basic_stats, 
+            opponent_hero_stats, 
+            opponent_matches
+        )
+        
         demo_match_data = {
             "status": "in_game",
             "message": f"Demo match found! Player DemoPlayer#1234 vs {demo_battle_tag}",
