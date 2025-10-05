@@ -88,6 +88,11 @@ async def get_player_statistics(battle_tag: str) -> Optional[Dict]:
     endpoint = f"players/{battle_tag}/race-stats"
     return await get_w3c_data(endpoint)
 
+async def get_player_hero_stats(battle_tag: str, season: int = 22) -> Optional[Dict]:
+    """Get detailed hero statistics on maps vs races for a player"""
+    endpoint = f"player-stats/{battle_tag}/hero-on-map-versus-race?season={season}"
+    return await get_w3c_data(endpoint)
+
 async def search_matches(battle_tag: str, offset: int = 0, page_size: int = 10) -> Optional[Dict]:
     """Search recent matches for a player"""
     endpoint = f"matches/search?playername={battle_tag}&offset={offset}&pageSize={page_size}"
