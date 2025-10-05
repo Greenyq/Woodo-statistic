@@ -65,6 +65,16 @@ class OpponentStats(BaseModel):
 async def get_w3c_data(endpoint: str) -> Optional[Dict]:
     """Fetch data from W3Champions API"""
     try:
+        # URL encode the endpoint to handle special characters like #
+        from urllib.parse import quote
+        if "#" in endpoint:
+            # Split endpoint and encode battle tag part
+            parts = endpoint.split("/")
+            for i, part in enumerate(parts):
+                if "#" in part:
+                    parts[i] = quote(part, safe='')
+            endpoint = "/".join(parts)
+        
         async with httpx.AsyncClient(timeout=10.0) as client:
             response = await client.get(f"{W3C_API_BASE}/{endpoint}")
             if response.status_code == 200:
