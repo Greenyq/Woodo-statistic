@@ -104,20 +104,14 @@ function App() {
   };
 
   const showDemoMatch = () => {
-    // Fill form with demo data if not already filled
-    if (!playerData.nickname || !playerData.battle_tag || !playerData.race) {
-      setPlayerData({
-        nickname: "DemoPlayer",
-        battle_tag: "DemoPlayer#1234", 
-        race: "Human"
-      });
-    }
-    
-    const currentPlayerData = {
-      nickname: playerData.nickname || "DemoPlayer",
-      battle_tag: playerData.battle_tag || "DemoPlayer#1234",
-      race: playerData.race || "Human"
+    // Set form data for demo
+    const demoPlayerData = {
+      nickname: "DemoPlayer",
+      battle_tag: "DemoPlayer#1234", 
+      race: "Human"
     };
+    
+    setPlayerData(demoPlayerData);
     
     // Demo data to show what happens when a match is found
     const demoMatchData = {
