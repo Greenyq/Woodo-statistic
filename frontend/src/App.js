@@ -24,6 +24,8 @@ function App() {
   const [matchStatus, setMatchStatus] = useState(null);
   const [error, setError] = useState("");
   const [lastChecked, setLastChecked] = useState(null);
+  const [autoMonitoring, setAutoMonitoring] = useState(false);
+  const [intervalId, setIntervalId] = useState(null);
 
   const races = [
     { value: "Human", label: "Human", icon: "⚔️" },
