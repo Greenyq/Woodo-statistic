@@ -1,14 +1,17 @@
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI, APIRouter, HTTPException
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
 import logging
+import httpx
+import asyncio
 from pathlib import Path
-from pydantic import BaseModel, Field
-from typing import List
+from pydantic import BaseModel, Field, validator
+from typing import List, Optional, Dict, Any
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
+import re
 
 
 ROOT_DIR = Path(__file__).parent
@@ -25,32 +28,188 @@ app = FastAPI()
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
 
+# W3Champions API base URL
+W3C_API_BASE = "https://website-backend.w3champions.com/api"
 
 # Define Models
-class StatusCheck(BaseModel):
+class PlayerInput(BaseModel):
+    nickname: str = Field(..., min_length=1, max_length=50)
+    battle_tag: str = Field(..., min_length=1)
+    race: str = Field(..., regex="^(Human|Orc|Night Elf|Undead|Random)$")
+    
+    @validator('battle_tag')
+    def validate_battle_tag(cls, v):
+        if not re.match(r'^[a-zA-Z0-9]+#\d{4,5}$', v):
+            raise ValueError('Battle tag must be in format PlayerName#1234')
+        return v
+
+class MatchStatus(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    client_name: str
-    timestamp: datetime = Field(default_factory=datetime.utcnow)
+    battle_tag: str
+    is_in_game: bool = False
+    match_data: Optional[Dict[Any, Any]] = None
+    opponent_data: Optional[Dict[Any, Any]] = None
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
-class StatusCheckCreate(BaseModel):
-    client_name: str
+class OpponentStats(BaseModel):
+    battle_tag: str
+    race: int
+    wins: int
+    losses: int
+    winrate: float
+    mmr: Optional[int] = None
+    hero_stats: List[Dict[str, Any]] = []
+    recent_matches: List[Dict[str, Any]] = []
 
-# Add your routes to the router instead of directly to app
+# W3Champions API client
+async def get_w3c_data(endpoint: str) -> Optional[Dict]:
+    """Fetch data from W3Champions API"""
+    try:
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            response = await client.get(f"{W3C_API_BASE}/{endpoint}")
+            if response.status_code == 200:
+                return response.json()
+            elif response.status_code == 204:
+                return None  # No content (e.g., player not in game)
+            else:
+                logging.warning(f"W3C API returned {response.status_code} for {endpoint}")
+                return None
+    except Exception as e:
+        logging.error(f"Error fetching W3C data from {endpoint}: {str(e)}")
+        return None
+
+async def check_ongoing_match(battle_tag: str) -> Optional[Dict]:
+    """Check if player is in an ongoing match"""
+    endpoint = f"matches/ongoing/{battle_tag}"
+    return await get_w3c_data(endpoint)
+
+async def get_player_statistics(battle_tag: str) -> Optional[Dict]:
+    """Get player statistics"""
+    endpoint = f"players/{battle_tag}/race-stats"
+    return await get_w3c_data(endpoint)
+
+async def search_matches(battle_tag: str, offset: int = 0, page_size: int = 10) -> Optional[Dict]:
+    """Search recent matches for a player"""
+    endpoint = f"matches/search?playername={battle_tag}&offset={offset}&pageSize={page_size}"
+    return await get_w3c_data(endpoint)
+
+def get_race_number(race_name: str) -> int:
+    """Convert race name to W3C race number"""
+    race_map = {
+        "Human": 1,
+        "Orc": 2,
+        "Night Elf": 4,
+        "Undead": 8,
+        "Random": 16
+    }
+    return race_map.get(race_name, 16)
+
+def get_race_name(race_number: int) -> str:
+    """Convert W3C race number to race name"""
+    race_map = {
+        1: "Human",
+        2: "Orc", 
+        4: "Night Elf",
+        8: "Undead",
+        16: "Random"
+    }
+    return race_map.get(race_number, "Unknown")
+
+# Routes
 @api_router.get("/")
 async def root():
-    return {"message": "Hello World"}
+    return {"message": "W3Champions Match Scout API"}
 
-@api_router.post("/status", response_model=StatusCheck)
-async def create_status_check(input: StatusCheckCreate):
-    status_dict = input.dict()
-    status_obj = StatusCheck(**status_dict)
-    _ = await db.status_checks.insert_one(status_obj.dict())
-    return status_obj
+@api_router.post("/check-match")
+async def check_player_match(player_input: PlayerInput):
+    """Check if player is currently in a match and get opponent info"""
+    try:
+        battle_tag = player_input.battle_tag
+        
+        # Check if player is in ongoing match
+        match_data = await check_ongoing_match(battle_tag)
+        
+        if not match_data:
+            # Player not in match
+            match_status = MatchStatus(
+                battle_tag=battle_tag,
+                is_in_game=False
+            )
+            
+            # Store status in database
+            await db.match_statuses.insert_one(match_status.dict())
+            return {
+                "status": "not_in_game", 
+                "message": "Player is not currently in a match",
+                "data": match_status.dict()
+            }
+        
+        # Player is in match - extract opponent info
+        opponents = []
+        player_race_num = get_race_number(player_input.race)
+        
+        # Find opponents (players that are not the queried player)
+        for team in match_data.get("teams", []):
+            for player in team.get("players", []):
+                if player.get("battleTag") != battle_tag:
+                    opponent_tag = player.get("battleTag")
+                    if opponent_tag:
+                        # Get opponent statistics
+                        opponent_stats = await get_player_statistics(opponent_tag)
+                        opponent_matches = await search_matches(opponent_tag, 0, 20)
+                        
+                        opponents.append({
+                            "battle_tag": opponent_tag,
+                            "race": get_race_name(player.get("race", 16)),
+                            "statistics": opponent_stats,
+                            "recent_matches": opponent_matches
+                        })
+        
+        match_status = MatchStatus(
+            battle_tag=battle_tag,
+            is_in_game=True,
+            match_data=match_data,
+            opponent_data={"opponents": opponents}
+        )
+        
+        # Store status in database
+        await db.match_statuses.insert_one(match_status.dict())
+        
+        return {
+            "status": "in_game",
+            "message": "Player is currently in a match",
+            "data": match_status.dict()
+        }
+        
+    except Exception as e:
+        logging.error(f"Error checking match for {player_input.battle_tag}: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error checking match status: {str(e)}")
 
-@api_router.get("/status", response_model=List[StatusCheck])
-async def get_status_checks():
-    status_checks = await db.status_checks.find().to_list(1000)
-    return [StatusCheck(**status_check) for status_check in status_checks]
+@api_router.get("/player-stats/{battle_tag}")
+async def get_player_stats(battle_tag: str):
+    """Get detailed player statistics"""
+    try:
+        stats = await get_player_statistics(battle_tag)
+        matches = await search_matches(battle_tag, 0, 50)
+        
+        return {
+            "battle_tag": battle_tag,
+            "statistics": stats,
+            "recent_matches": matches
+        }
+    except Exception as e:
+        logging.error(f"Error getting player stats for {battle_tag}: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error getting player statistics: {str(e)}")
+
+@api_router.get("/match-history")
+async def get_match_history():
+    """Get stored match check history"""
+    try:
+        match_statuses = await db.match_statuses.find().sort("timestamp", -1).limit(50).to_list(50)
+        return {"match_history": match_statuses}
+    except Exception as e:
+        logging.error(f"Error getting match history: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error getting match history: {str(e)}")
 
 # Include the router in the main app
 app.include_router(api_router)

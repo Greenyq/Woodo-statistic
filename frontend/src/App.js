@@ -1,52 +1,291 @@
-import { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import "@/App.css";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
 import axios from "axios";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Loader2, Sword, Trophy, Target, User, Clock, Shield } from "lucide-react";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
-const Home = () => {
-  const helloWorldApi = async () => {
+function App() {
+  const [playerData, setPlayerData] = useState({
+    nickname: "",
+    battle_tag: "",
+    race: ""
+  });
+  const [loading, setLoading] = useState(false);
+  const [matchStatus, setMatchStatus] = useState(null);
+  const [error, setError] = useState("");
+  const [lastChecked, setLastChecked] = useState(null);
+
+  const races = [
+    { value: "Human", label: "Human", icon: "⚔️" },
+    { value: "Orc", label: "Orc", icon: "🪓" },
+    { value: "Night Elf", label: "Night Elf", icon: "🏹" },
+    { value: "Undead", label: "Undead", icon: "💀" },
+    { value: "Random", label: "Random", icon: "🎲" }
+  ];
+
+  const handleInputChange = (field, value) => {
+    setPlayerData(prev => ({ ...prev, [field]: value }));
+    setError("");
+  };
+
+  const validateBattleTag = (battleTag) => {
+    const regex = /^[a-zA-Z0-9]+#\d{4,5}$/;
+    return regex.test(battleTag);
+  };
+
+  const checkMatch = async () => {
+    if (!playerData.nickname || !playerData.battle_tag || !playerData.race) {
+      setError("Please fill in all fields");
+      return;
+    }
+
+    if (!validateBattleTag(playerData.battle_tag)) {
+      setError("Battle tag must be in format PlayerName#1234");
+      return;
+    }
+
+    setLoading(true);
+    setError("");
+    
     try {
-      const response = await axios.get(`${API}/`);
-      console.log(response.data.message);
-    } catch (e) {
-      console.error(e, `errored out requesting / api`);
+      const response = await axios.post(`${API}/check-match`, playerData);
+      setMatchStatus(response.data);
+      setLastChecked(new Date());
+    } catch (err) {
+      console.error("Error checking match:", err);
+      setError(err.response?.data?.detail || "Failed to check match status");
+    } finally {
+      setLoading(false);
     }
   };
 
-  useEffect(() => {
-    helloWorldApi();
-  }, []);
+  const getRaceIcon = (raceName) => {
+    const race = races.find(r => r.value === raceName);
+    return race?.icon || "❓";
+  };
 
-  return (
-    <div>
-      <header className="App-header">
-        <a
-          className="App-link"
-          href="https://emergent.sh"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <img src="https://avatars.githubusercontent.com/in/1201222?s=120&u=2686cf91179bbafbc7a71bfbc43004cf9ae1acea&v=4" />
-        </a>
-        <p className="mt-5">Building something incredible ~!</p>
-      </header>
-    </div>
+  const formatWinRate = (wins, losses) => {
+    const total = wins + losses;
+    if (total === 0) return "0%";
+    return `${Math.round((wins / total) * 100)}%`;
+  };
+
+  const OpponentCard = ({ opponent }) => (
+    <Card className="bg-slate-800/50 border-amber-600/30" data-testid={`opponent-card-${opponent.battle_tag}`}>
+      <CardHeader className="pb-3">
+        <CardTitle className="flex items-center gap-2 text-amber-400">
+          <User className="w-5 h-5" />
+          {opponent.battle_tag}
+          <Badge variant="secondary" className="bg-amber-600/20 text-amber-300">
+            {getRaceIcon(opponent.race)} {opponent.race}
+          </Badge>
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {opponent.statistics && (
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-green-400">
+                <Trophy className="w-4 h-4" />
+                <span className="text-sm">Statistics</span>
+              </div>
+              {opponent.statistics.raceStats?.map((stat, idx) => (
+                <div key={idx} className="text-sm bg-slate-700/50 p-2 rounded">
+                  <div className="flex justify-between">
+                    <span>{getRaceIcon(stat.race)} vs {playerData.race}</span>
+                    <span className="text-amber-300">{formatWinRate(stat.wins, stat.losses)}</span>
+                  </div>
+                  <div className="text-xs text-slate-400">
+                    {stat.wins}W - {stat.losses}L ({stat.games} games)
+                  </div>
+                </div>
+              )) || <div className="text-sm text-slate-400">No race statistics available</div>}
+            </div>
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-blue-400">
+                <Target className="w-4 h-4" />
+                <span className="text-sm">Recent Activity</span>
+              </div>
+              {opponent.recent_matches?.matches?.slice(0, 5).map((match, idx) => (
+                <div key={idx} className="text-xs bg-slate-700/50 p-2 rounded">
+                  <div className="flex justify-between items-center">
+                    <span className="text-amber-300">{match.map || "Unknown Map"}</span>
+                    <Badge 
+                      variant={match.won ? "success" : "destructive"}
+                      className={match.won ? "bg-green-600/20 text-green-300" : "bg-red-600/20 text-red-300"}
+                    >
+                      {match.won ? "W" : "L"}
+                    </Badge>
+                  </div>
+                  <div className="text-slate-400 mt-1">
+                    Duration: {Math.round(match.durationInSeconds / 60)}m
+                  </div>
+                </div>
+              )) || <div className="text-sm text-slate-400">No recent matches found</div>}
+            </div>
+          </div>
+        )}
+      </CardContent>
+    </Card>
   );
-};
 
-function App() {
   return (
-    <div className="App">
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Home />}>
-            <Route index element={<Home />} />
-          </Route>
-        </Routes>
-      </BrowserRouter>
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+      <div className="container mx-auto px-4 py-8">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <h1 className="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-500 mb-4">
+            W3Champions Match Scout
+          </h1>
+          <p className="text-slate-300 text-lg max-w-2xl mx-auto">
+            Monitor your Warcraft III matches and scout your opponents in real-time
+          </p>
+        </div>
+
+        {/* Player Input Form */}
+        <Card className="max-w-2xl mx-auto mb-8 bg-slate-800/50 border-amber-600/30" data-testid="player-input-form">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-amber-400">
+              <Shield className="w-5 h-5" />
+              Player Information
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="nickname" className="text-slate-200">Nickname</Label>
+                <Input
+                  id="nickname"
+                  data-testid="nickname-input"
+                  placeholder="Enter your nickname"
+                  value={playerData.nickname}
+                  onChange={(e) => handleInputChange("nickname", e.target.value)}
+                  className="bg-slate-700 border-slate-600 text-white placeholder-slate-400"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="battle-tag" className="text-slate-200">Battle Tag</Label>
+                <Input
+                  id="battle-tag"
+                  data-testid="battle-tag-input"
+                  placeholder="PlayerName#1234"
+                  value={playerData.battle_tag}
+                  onChange={(e) => handleInputChange("battle_tag", e.target.value)}
+                  className="bg-slate-700 border-slate-600 text-white placeholder-slate-400"
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label className="text-slate-200">Race</Label>
+              <Select
+                value={playerData.race}
+                onValueChange={(value) => handleInputChange("race", value)}
+              >
+                <SelectTrigger data-testid="race-selector" className="bg-slate-700 border-slate-600 text-white">
+                  <SelectValue placeholder="Select your race" />
+                </SelectTrigger>
+                <SelectContent className="bg-slate-800 border-slate-600">
+                  {races.map(race => (
+                    <SelectItem 
+                      key={race.value} 
+                      value={race.value}
+                      className="text-white hover:bg-slate-700"
+                    >
+                      {race.icon} {race.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {error && (
+              <Alert className="border-red-600/50 bg-red-600/10">
+                <AlertDescription className="text-red-400">{error}</AlertDescription>
+              </Alert>
+            )}
+
+            <Button
+              onClick={checkMatch}
+              disabled={loading}
+              className="w-full bg-amber-600 hover:bg-amber-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors"
+              data-testid="check-match-btn"
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Checking Match...
+                </>
+              ) : (
+                <>
+                  <Sword className="w-4 h-4 mr-2" />
+                  Check Match Status
+                </>
+              )}
+            </Button>
+
+            {lastChecked && (
+              <div className="flex items-center gap-2 text-sm text-slate-400 justify-center">
+                <Clock className="w-4 h-4" />
+                Last checked: {lastChecked.toLocaleTimeString()}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Match Status Results */}
+        {matchStatus && (
+          <div className="max-w-6xl mx-auto" data-testid="match-results">
+            <Card className="mb-6 bg-slate-800/50 border-amber-600/30">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-amber-400">
+                  <Target className="w-5 h-5" />
+                  Match Status
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {matchStatus.status === "not_in_game" ? (
+                  <Alert className="border-blue-600/50 bg-blue-600/10">
+                    <AlertDescription className="text-blue-300">
+                      Player {matchStatus.data.battle_tag} is not currently in a match.
+                    </AlertDescription>
+                  </Alert>
+                ) : (
+                  <Alert className="border-green-600/50 bg-green-600/10">
+                    <AlertDescription className="text-green-300">
+                      Match found! Player {matchStatus.data.battle_tag} is currently in game.
+                    </AlertDescription>
+                  </Alert>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Opponent Information */}
+            {matchStatus.status === "in_game" && matchStatus.data.opponent_data?.opponents && (
+              <div className="space-y-6">
+                <div className="text-center">
+                  <h2 className="text-2xl font-bold text-amber-400 mb-2">Opponent Analysis</h2>
+                  <Separator className="bg-amber-600/30" />
+                </div>
+                <div className="grid gap-6">
+                  {matchStatus.data.opponent_data.opponents.map((opponent, index) => (
+                    <OpponentCard key={index} opponent={opponent} />
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
