@@ -601,7 +601,7 @@ function App() {
             </Card>
 
             {/* Opponent Information */}
-            {matchStatus.status === "in_game" && matchStatus.data.opponent_data?.opponents && (
+            {matchStatus && matchStatus.status === "in_game" && matchStatus.data && matchStatus.data.opponent_data && matchStatus.data.opponent_data.opponents && matchStatus.data.opponent_data.opponents.length > 0 && (
               <div className="space-y-6">
                 <div className="text-center">
                   <h2 className="text-2xl font-bold text-amber-400 mb-2">Opponent Analysis</h2>
