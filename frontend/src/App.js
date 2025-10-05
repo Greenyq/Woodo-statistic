@@ -188,7 +188,7 @@ function App() {
               hero_stats: {
                 heroStatsItemList: [
                   {
-                    heroId: "blademaster",
+                    heroId: "archmage",
                     stats: [
                       {
                         race: 1,
@@ -197,23 +197,23 @@ function App() {
                             map: "Overall",
                             winLosses: [
                               {
-                                race: 1, // vs Human
-                                wins: 23,
-                                losses: 12,
-                                games: 35,
-                                winrate: 0.657
+                                race: 1, // vs Human  
+                                wins: 16,
+                                losses: 6,
+                                games: 22,
+                                winrate: 0.7272727272727273
                               }
                             ]
                           },
                           {
-                            map: "2506221057LastRefugev1_5",
+                            map: "2506221057ConcealedHill",
                             winLosses: [
                               {
                                 race: 1,
-                                wins: 8,
-                                losses: 2,
-                                games: 10,
-                                winrate: 0.8
+                                wins: 2,
+                                losses: 0,
+                                games: 2,
+                                winrate: 1.0
                               }
                             ]
                           }
@@ -222,7 +222,7 @@ function App() {
                     ]
                   },
                   {
-                    heroId: "farseer",
+                    heroId: "mountainking",
                     stats: [
                       {
                         race: 1,
@@ -232,10 +232,10 @@ function App() {
                             winLosses: [
                               {
                                 race: 1,
-                                wins: 15,
-                                losses: 18,
-                                games: 33,
-                                winrate: 0.455
+                                wins: 13,
+                                losses: 7,
+                                games: 20,
+                                winrate: 0.65
                               }
                             ]
                           }
