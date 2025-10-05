@@ -45,7 +45,7 @@ function App() {
     return regex.test(battleTag);
   };
 
-  const checkMatch = async () => {
+  const checkMatch = async (silent = false) => {
     if (!playerData.nickname || !playerData.battle_tag || !playerData.race) {
       setError("Please fill in all fields");
       return;
@@ -56,7 +56,7 @@ function App() {
       return;
     }
 
-    setLoading(true);
+    if (!silent) setLoading(true);
     setError("");
     
     try {
@@ -67,9 +67,50 @@ function App() {
       console.error("Error checking match:", err);
       setError(err.response?.data?.detail || "Failed to check match status");
     } finally {
-      setLoading(false);
+      if (!silent) setLoading(false);
     }
   };
+
+  const startAutoMonitoring = () => {
+    if (!playerData.nickname || !playerData.battle_tag || !playerData.race) {
+      setError("Please fill in all fields before starting auto-monitoring");
+      return;
+    }
+
+    if (!validateBattleTag(playerData.battle_tag)) {
+      setError("Battle tag must be in format PlayerName#1234");
+      return;
+    }
+
+    setAutoMonitoring(true);
+    
+    // First check immediately
+    checkMatch(true);
+    
+    // Then check every 5 seconds
+    const id = setInterval(() => {
+      checkMatch(true);
+    }, 5000);
+    
+    setIntervalId(id);
+  };
+
+  const stopAutoMonitoring = () => {
+    setAutoMonitoring(false);
+    if (intervalId) {
+      clearInterval(intervalId);
+      setIntervalId(null);
+    }
+  };
+
+  // Cleanup on component unmount
+  useEffect(() => {
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    };
+  }, [intervalId]);
 
   const getRaceIcon = (raceName) => {
     const race = races.find(r => r.value === raceName);
