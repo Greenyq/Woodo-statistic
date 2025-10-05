@@ -36,7 +36,12 @@ function App() {
   ];
 
   const handleInputChange = (field, value) => {
-    setPlayerData(prev => ({ ...prev, [field]: value }));
+    console.log('Form change:', field, value);
+    setPlayerData(prev => {
+      const newData = { ...prev, [field]: value };
+      console.log('New player data:', newData);
+      return newData;
+    });
     setError("");
   };
 
