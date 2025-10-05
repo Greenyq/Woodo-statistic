@@ -20,6 +20,11 @@ function App() {
     battle_tag: "",
     race: ""
   });
+  
+  // Add refs for direct DOM manipulation as fallback
+  const nicknameRef = useRef(null);
+  const battleTagRef = useRef(null);
+  const raceRef = useRef(null);
   const [loading, setLoading] = useState(false);
   const [matchStatus, setMatchStatus] = useState(null);
   const [error, setError] = useState("");
