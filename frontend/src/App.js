@@ -119,7 +119,7 @@ function App() {
       message: "Player TestPlayer#1234 is currently in game",
       data: {
         id: "demo-match-id",
-        battle_tag: currentPlayerData.battle_tag,
+        battle_tag: demoPlayerData.battle_tag,
         is_in_game: true,
         match_data: {
           id: "demo-match",
