@@ -206,9 +206,23 @@ function App() {
       "dreadlord": "👹",
       "lich": "❄️",
       "cryptlord": "🕷️",
-      "tinker": "⚙️"
+      "tinker": "⚙️",
+      "bansheeranger": "⭐",
+      "avatarofflame": "🔥"
     };
     return heroIcons[heroId] || "⭐";
+  };
+
+  // Map heroes to their races
+  const getHeroesByRace = (race) => {
+    const herosByRace = {
+      "Human": ["archmage", "mountainking", "paladin", "bloodmage"],
+      "Orc": ["blademaster", "farseer", "taurenchieftain", "shadowhunter"],
+      "Night Elf": ["demonhunter", "keeperofthegrove", "moonpriestess", "warden", "bansheeranger"],
+      "Undead": ["deathknight", "dreadlord", "lich", "cryptlord"],
+      "Random": [] // Random can use any heroes
+    };
+    return herosByRace[race] || [];
   };
 
   const getPlayerRaceNumber = () => {
