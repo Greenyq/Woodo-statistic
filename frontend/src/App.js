@@ -299,10 +299,20 @@ function App() {
               )}
             </div>
 
-            {lastChecked && (
-              <div className="flex items-center gap-2 text-sm text-slate-400 justify-center">
-                <Clock className="w-4 h-4" />
-                Last checked: {lastChecked.toLocaleTimeString()}
+            {(lastChecked || autoMonitoring) && (
+              <div className="flex items-center gap-4 text-sm justify-center">
+                {lastChecked && (
+                  <div className="flex items-center gap-2 text-slate-400">
+                    <Clock className="w-4 h-4" />
+                    Last checked: {lastChecked.toLocaleTimeString()}
+                  </div>
+                )}
+                {autoMonitoring && (
+                  <div className="flex items-center gap-2 text-green-400">
+                    <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                    Auto monitoring active
+                  </div>
+                )}
               </div>
             )}
           </CardContent>
