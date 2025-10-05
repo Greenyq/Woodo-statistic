@@ -332,13 +332,13 @@ function App() {
               
               <div className="mt-2 text-sm">
                 {vsMyRaceStats.winrate >= 65 && (
-                  <span className="text-red-300 font-semibold">🚨 ВЫСОКАЯ УГРОЗА! Очень силен против {playerData.race}</span>
+                  <span className="text-red-300 font-semibold">🚨 КРИТИЧЕСКАЯ УГРОЗА! {vsMyRaceStats.winrate}% против {playerData.race} - будьте осторожны!</span>
                 )}
                 {vsMyRaceStats.winrate >= 50 && vsMyRaceStats.winrate < 65 && (
-                  <span className="text-yellow-300 font-semibold">⚠️ СРЕДНЯЯ УГРОЗА. Стабилен против {playerData.race}</span>
+                  <span className="text-yellow-300 font-semibold">⚠️ СРЕДНЯЯ УГРОЗА! {vsMyRaceStats.winrate}% против {playerData.race} - стабильный противник</span>
                 )}
                 {vsMyRaceStats.winrate < 50 && (
-                  <span className="text-green-300 font-semibold">✅ СЛАБОЕ МЕСТО! Плохо играет против {playerData.race}</span>
+                  <span className="text-green-300 font-semibold">✅ УЯЗВИМОСТЬ! Всего {vsMyRaceStats.winrate}% против {playerData.race} - используйте это!</span>
                 )}
               </div>
             </div>
