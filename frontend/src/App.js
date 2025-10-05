@@ -600,22 +600,6 @@ function App() {
               </CardContent>
             </Card>
 
-            {/* Opponent Data Debug */}
-            {matchStatus && matchStatus.data.opponent_data && (
-              <Card className="mb-6 bg-slate-800/50 border-yellow-600/30">
-                <CardHeader>
-                  <CardTitle className="text-yellow-400">Opponents Found: {matchStatus.data.opponent_data.opponents?.length || 0}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-sm text-slate-300">
-                    Status: {matchStatus.status}<br/>
-                    Has opponents: {matchStatus.data.opponent_data?.opponents ? 'Yes' : 'No'}<br/>
-                    Opponents count: {matchStatus.data.opponent_data?.opponents?.length || 0}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
             {/* Opponent Information */}
             {matchStatus.status === "in_game" && matchStatus.data.opponent_data?.opponents && (
               <div className="space-y-6">
