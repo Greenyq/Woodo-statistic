@@ -137,7 +137,7 @@ function App() {
         opponent_data: {
           opponents: [
             {
-              battle_tag: "ProGamer#5678",
+              battle_tag: "Clover#21325",
               race: "Orc",
               basic_stats: {
                 battleTag: "ProGamer#5678",
