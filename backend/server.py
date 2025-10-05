@@ -159,15 +159,17 @@ async def check_player_match(player_input: PlayerInput):
                 if player.get("battleTag") != battle_tag:
                     opponent_tag = player.get("battleTag")
                     if opponent_tag:
-                        # Get opponent statistics
+                        # Get comprehensive opponent statistics
                         opponent_stats = await get_player_statistics(opponent_tag)
                         opponent_matches = await search_matches(opponent_tag, 0, 20)
+                        opponent_hero_stats = await get_player_hero_stats(opponent_tag)
                         
                         opponents.append({
                             "battle_tag": opponent_tag,
                             "race": get_race_name(player.get("race", 16)),
                             "statistics": opponent_stats,
-                            "recent_matches": opponent_matches
+                            "recent_matches": opponent_matches,
+                            "hero_stats": opponent_hero_stats
                         })
         
         match_status = MatchStatus(
