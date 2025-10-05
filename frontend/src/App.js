@@ -306,6 +306,18 @@ function App() {
     return raceMap[playerData.race] || 1;
   };
 
+  const get_race_name_from_number = (raceNum) => {
+    const raceMap = {
+      0: "Random",
+      1: "Human",
+      2: "Orc",
+      4: "Night Elf",
+      8: "Undead",
+      16: "Random"
+    };
+    return raceMap[raceNum] || "Unknown";
+  };
+
   const OpponentCard = ({ opponent }) => {
     const playerRaceNum = getPlayerRaceNumber();
     
