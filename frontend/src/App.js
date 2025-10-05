@@ -103,6 +103,69 @@ function App() {
     }
   };
 
+  const showDemoMatch = () => {
+    // Demo data to show what happens when a match is found
+    const demoMatchData = {
+      status: "in_game",
+      message: "Player TestPlayer#1234 is currently in game",
+      data: {
+        id: "demo-match-id",
+        battle_tag: "TestPlayer#1234",
+        is_in_game: true,
+        match_data: {
+          id: "demo-match",
+          map: "Lost Temple",
+          matchType: "1v1"
+        },
+        opponent_data: {
+          opponents: [
+            {
+              battle_tag: "ProGamer#5678",
+              race: "Orc",
+              statistics: {
+                raceStats: [
+                  {
+                    race: "vs Human",
+                    wins: 127,
+                    losses: 89,
+                    games: 216,
+                    winrate: 0.588
+                  }
+                ]
+              },
+              recent_matches: {
+                matches: [
+                  {
+                    map: "Lost Temple",
+                    won: true,
+                    durationInSeconds: 852,
+                    heroUsed: "Blademaster"
+                  },
+                  {
+                    map: "Lost Temple", 
+                    won: false,
+                    durationInSeconds: 1234,
+                    heroUsed: "Far Seer"
+                  },
+                  {
+                    map: "Twisted Meadows",
+                    won: true,
+                    durationInSeconds: 456,
+                    heroUsed: "Blademaster"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        timestamp: new Date().toISOString()
+      }
+    };
+    
+    setMatchStatus(demoMatchData);
+    setLastChecked(new Date());
+  };
+
   // Cleanup on component unmount
   useEffect(() => {
     return () => {
