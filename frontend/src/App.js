@@ -592,6 +592,60 @@ function App() {
           </CardContent>
         </Card>
 
+        {/* Test Static Opponent Stats */}
+        <div className="max-w-6xl mx-auto mb-6">
+          <Card className="bg-slate-800/50 border-amber-600/30">
+            <CardHeader>
+              <CardTitle className="text-amber-400">🧪 Static Test - Opponent Analysis</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-6">
+                <div className="bg-slate-700/50 p-4 rounded-lg">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <span className="text-lg">⚔️</span>
+                      <span className="text-amber-300 font-medium">Blademaster</span>
+                    </div>
+                    <div className="text-right">
+                      <div className="font-semibold text-red-400">66%</div>
+                      <div className="text-xs text-slate-400">23W-12L</div>
+                    </div>
+                  </div>
+                  <div className="space-y-1">
+                    <div className="text-xs flex justify-between text-slate-300">
+                      <span>LastRefuge</span>
+                      <span className="text-red-300">80% (8)</span>
+                    </div>
+                    <div className="text-xs flex justify-between text-slate-300">
+                      <span>ConcealedHill</span>
+                      <span className="text-yellow-300">50% (6)</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="bg-slate-700/50 p-4 rounded-lg">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <span className="text-lg">🌩️</span>
+                      <span className="text-amber-300 font-medium">Far Seer</span>
+                    </div>
+                    <div className="text-right">
+                      <div className="font-semibold text-green-400">46%</div>
+                      <div className="text-xs text-slate-400">15W-18L</div>
+                    </div>
+                  </div>
+                  <div className="space-y-1">
+                    <div className="text-xs flex justify-between text-slate-300">
+                      <span>Overall vs Human</span>
+                      <span className="text-green-300">Weak pick!</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
         {/* Match Status Results */}
         {matchStatus && (
           <div className="max-w-6xl mx-auto" data-testid="match-results">
