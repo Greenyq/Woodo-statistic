@@ -378,6 +378,19 @@ function App() {
                 )}
               </div>
             )}
+            
+            {/* Demo button */}
+            <div className="text-center mt-4">
+              <Button
+                onClick={showDemoMatch}
+                variant="outline"
+                className="border-amber-600/50 text-amber-400 hover:bg-amber-600/10"
+                data-testid="demo-match-btn"
+              >
+                <Trophy className="w-4 h-4 mr-2" />
+                Show Demo Match Found
+              </Button>
+            </div>
           </CardContent>
         </Card>
 
