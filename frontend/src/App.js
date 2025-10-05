@@ -131,17 +131,34 @@ function App() {
             {
               battle_tag: "ProGamer#5678",
               race: "Orc",
-              statistics: {
-                raceStats: [
+              basic_stats: {
+                battleTag: "ProGamer#5678",
+                winLosses: [
                   {
-                    race: "vs Human",
+                    race: 1,
                     wins: 127,
                     losses: 89,
                     games: 216,
                     winrate: 0.588
+                  },
+                  {
+                    race: 2,
+                    wins: 89,
+                    losses: 65,
+                    games: 154,
+                    winrate: 0.578
                   }
                 ]
               },
+              race_stats: [
+                {
+                  race: 2,
+                  wins: 89,
+                  losses: 65,
+                  games: 154,
+                  winrate: 0.578
+                }
+              ],
               recent_matches: {
                 matches: [
                   {
