@@ -246,64 +246,174 @@ function App() {
     return `${Math.round((wins / total) * 100)}%`;
   };
 
-  const OpponentCard = ({ opponent }) => (
-    <Card className="bg-slate-800/50 border-amber-600/30" data-testid={`opponent-card-${opponent.battle_tag}`}>
-      <CardHeader className="pb-3">
-        <CardTitle className="flex items-center gap-2 text-amber-400">
-          <User className="w-5 h-5" />
-          {opponent.battle_tag}
-          <Badge variant="secondary" className="bg-amber-600/20 text-amber-300">
-            {getRaceIcon(opponent.race)} {opponent.race}
-          </Badge>
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        {opponent.statistics && (
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <div className="flex items-center gap-2 text-green-400">
-                <Trophy className="w-4 h-4" />
-                <span className="text-sm">Statistics</span>
+  const getHeroIcon = (heroId) => {
+    const heroIcons = {
+      "archmage": "🔮",
+      "mountainking": "⚒️",
+      "paladin": "🛡️",
+      "bloodmage": "🩸",
+      "blademaster": "⚔️",
+      "farseer": "🌩️",
+      "taurenchieftain": "🐂",
+      "shadowhunter": "🏹",
+      "demonhunter": "😈",
+      "keeperofthegrove": "🌳",
+      "moonpriestess": "🌙",
+      "warden": "🦉",
+      "deathknight": "💀",
+      "dreadlord": "👹",
+      "lich": "❄️",
+      "cryptlord": "🕷️",
+      "tinker": "⚙️"
+    };
+    return heroIcons[heroId] || "⭐";
+  };
+
+  const getPlayerRaceNumber = () => {
+    const raceMap = {
+      "Human": 1,
+      "Orc": 2,
+      "Night Elf": 4,
+      "Undead": 8,
+      "Random": 16
+    };
+    return raceMap[playerData.race] || 1;
+  };
+
+  const OpponentCard = ({ opponent }) => {
+    const playerRaceNum = getPlayerRaceNumber();
+    
+    return (
+      <Card className="bg-slate-800/50 border-amber-600/30" data-testid={`opponent-card-${opponent.battle_tag}`}>
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center gap-2 text-amber-400">
+            <User className="w-5 h-5" />
+            {opponent.battle_tag}
+            <Badge variant="secondary" className="bg-amber-600/20 text-amber-300">
+              {getRaceIcon(opponent.race)} {opponent.race}
+            </Badge>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {/* Hero Statistics vs Your Race */}
+          {opponent.hero_stats?.heroStatsItemList && (
+            <div className="space-y-3">
+              <div className="flex items-center gap-2 text-purple-400">
+                <Shield className="w-4 h-4" />
+                <span className="text-sm font-semibold">Hero Picks vs {playerData.race}</span>
               </div>
-              {opponent.statistics.raceStats?.map((stat, idx) => (
-                <div key={idx} className="text-sm bg-slate-700/50 p-2 rounded">
-                  <div className="flex justify-between">
-                    <span>{getRaceIcon(stat.race)} vs {playerData.race}</span>
-                    <span className="text-amber-300">{formatWinRate(stat.wins, stat.losses)}</span>
-                  </div>
-                  <div className="text-xs text-slate-400">
-                    {stat.wins}W - {stat.losses}L ({stat.games} games)
-                  </div>
-                </div>
-              )) || <div className="text-sm text-slate-400">No race statistics available</div>}
-            </div>
-            <div className="space-y-2">
-              <div className="flex items-center gap-2 text-blue-400">
-                <Target className="w-4 h-4" />
-                <span className="text-sm">Recent Activity</span>
+              <div className="grid gap-2 max-h-64 overflow-y-auto">
+                {opponent.hero_stats.heroStatsItemList.map((heroStat, idx) => {
+                  // Find stats for this hero against your race
+                  const heroVsYourRace = heroStat.stats.find(stat => 
+                    stat.winLossesOnMap.some(mapStat => 
+                      mapStat.winLosses.some(winLoss => winLoss.race === playerRaceNum && winLoss.games > 0)
+                    )
+                  );
+                  
+                  if (!heroVsYourRace) return null;
+                  
+                  const overallStats = heroVsYourRace.winLossesOnMap.find(map => map.map === "Overall");
+                  const vsYourRaceStats = overallStats?.winLosses.find(wl => wl.race === playerRaceNum);
+                  
+                  if (!vsYourRaceStats || vsYourRaceStats.games === 0) return null;
+                  
+                  return (
+                    <div key={idx} className="bg-slate-700/50 p-3 rounded-lg">
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-2">
+                          <span className="text-lg">{getHeroIcon(heroStat.heroId)}</span>
+                          <span className="text-amber-300 font-medium capitalize">
+                            {heroStat.heroId.replace(/([A-Z])/g, ' $1').trim()}
+                          </span>
+                        </div>
+                        <div className="text-right">
+                          <div className={`font-semibold ${vsYourRaceStats.winrate > 0.6 ? 'text-red-400' : 
+                            vsYourRaceStats.winrate > 0.4 ? 'text-yellow-400' : 'text-green-400'}`}>
+                            {Math.round(vsYourRaceStats.winrate * 100)}%
+                          </div>
+                          <div className="text-xs text-slate-400">
+                            {vsYourRaceStats.wins}W-{vsYourRaceStats.losses}L
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {/* Map specific stats */}
+                      <div className="space-y-1">
+                        {heroVsYourRace.winLossesOnMap.filter(mapStat => 
+                          mapStat.map !== "Overall" && 
+                          mapStat.winLosses.some(wl => wl.race === playerRaceNum && wl.games > 0)
+                        ).slice(0, 3).map((mapStat, mapIdx) => {
+                          const mapVsYou = mapStat.winLosses.find(wl => wl.race === playerRaceNum);
+                          if (!mapVsYou || mapVsYou.games === 0) return null;
+                          
+                          return (
+                            <div key={mapIdx} className="text-xs flex justify-between text-slate-300">
+                              <span className="truncate max-w-32">{mapStat.map.replace(/^\d+/, '').replace(/v\d+_\d+$/, '')}</span>
+                              <span className={mapVsYou.winrate > 0.6 ? 'text-red-300' : 
+                                mapVsYou.winrate > 0.4 ? 'text-yellow-300' : 'text-green-300'}>
+                                {Math.round(mapVsYou.winrate * 100)}% ({mapVsYou.games})
+                              </span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
-              {opponent.recent_matches?.matches?.slice(0, 5).map((match, idx) => (
-                <div key={idx} className="text-xs bg-slate-700/50 p-2 rounded">
-                  <div className="flex justify-between items-center">
-                    <span className="text-amber-300">{match.map || "Unknown Map"}</span>
-                    <Badge 
-                      variant={match.won ? "success" : "destructive"}
-                      className={match.won ? "bg-green-600/20 text-green-300" : "bg-red-600/20 text-red-300"}
-                    >
-                      {match.won ? "W" : "L"}
-                    </Badge>
-                  </div>
-                  <div className="text-slate-400 mt-1">
-                    Duration: {Math.round(match.durationInSeconds / 60)}m
-                  </div>
-                </div>
-              )) || <div className="text-sm text-slate-400">No recent matches found</div>}
             </div>
-          </div>
-        )}
-      </CardContent>
-    </Card>
-  );
+          )}
+
+          {/* Overall Statistics */}
+          {opponent.statistics && (
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 text-green-400">
+                  <Trophy className="w-4 h-4" />
+                  <span className="text-sm">Overall Stats</span>
+                </div>
+                {opponent.statistics.raceStats?.map((stat, idx) => (
+                  <div key={idx} className="text-sm bg-slate-700/50 p-2 rounded">
+                    <div className="flex justify-between">
+                      <span>{getRaceIcon(stat.race)} vs {playerData.race}</span>
+                      <span className="text-amber-300">{formatWinRate(stat.wins, stat.losses)}</span>
+                    </div>
+                    <div className="text-xs text-slate-400">
+                      {stat.wins}W - {stat.losses}L ({stat.games} games)
+                    </div>
+                  </div>
+                )) || <div className="text-sm text-slate-400">No race statistics available</div>}
+              </div>
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 text-blue-400">
+                  <Target className="w-4 h-4" />
+                  <span className="text-sm">Recent Matches</span>
+                </div>
+                {opponent.recent_matches?.matches?.slice(0, 5).map((match, idx) => (
+                  <div key={idx} className="text-xs bg-slate-700/50 p-2 rounded">
+                    <div className="flex justify-between items-center">
+                      <span className="text-amber-300 truncate">{match.map?.replace(/^\d+/, '') || "Unknown"}</span>
+                      <Badge 
+                        variant={match.won ? "success" : "destructive"}
+                        className={match.won ? "bg-green-600/20 text-green-300" : "bg-red-600/20 text-red-300"}
+                      >
+                        {match.won ? "W" : "L"}
+                      </Badge>
+                    </div>
+                    <div className="text-slate-400 mt-1">
+                      {Math.round(match.durationInSeconds / 60)}m
+                      {match.heroUsed && <span className="ml-2">{getHeroIcon(match.heroUsed.toLowerCase())}</span>}
+                    </div>
+                  </div>
+                )) || <div className="text-sm text-slate-400">No recent matches found</div>}
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    );
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
