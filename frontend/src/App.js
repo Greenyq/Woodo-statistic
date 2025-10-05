@@ -51,7 +51,8 @@ function App() {
   };
 
   const validateBattleTag = (battleTag) => {
-    const regex = /^[a-zA-Z0-9]+#\d{4,5}$/;
+    // Support international characters including Cyrillic
+    const regex = /^[\w\u0400-\u04FF\u0500-\u052F]+#\d{4,5}$/u;
     return regex.test(battleTag);
   };
 
