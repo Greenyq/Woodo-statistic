@@ -469,7 +469,8 @@ async def get_demo_match():
         opponent_achievements = analyze_player_achievements(
             opponent_basic_stats, 
             opponent_hero_stats, 
-            opponent_matches
+            opponent_matches,
+            "Night Elf"  # Siberia#21832 is Night Elf main
         )
         
         demo_match_data = {
