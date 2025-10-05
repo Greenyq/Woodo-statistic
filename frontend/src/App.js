@@ -257,24 +257,47 @@ function App() {
               </Alert>
             )}
 
-            <Button
-              onClick={checkMatch}
-              disabled={loading}
-              className="w-full bg-amber-600 hover:bg-amber-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors"
-              data-testid="check-match-btn"
-            >
-              {loading ? (
-                <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Checking Match...
-                </>
+            <div className="grid md:grid-cols-2 gap-3">
+              <Button
+                onClick={() => checkMatch()}
+                disabled={loading || autoMonitoring}
+                className="bg-amber-600 hover:bg-amber-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors"
+                data-testid="check-match-btn"
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Checking...
+                  </>
+                ) : (
+                  <>
+                    <Sword className="w-4 h-4 mr-2" />
+                    Check Now
+                  </>
+                )}
+              </Button>
+              
+              {!autoMonitoring ? (
+                <Button
+                  onClick={startAutoMonitoring}
+                  disabled={loading}
+                  className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors"
+                  data-testid="start-monitoring-btn"
+                >
+                  <Target className="w-4 h-4 mr-2" />
+                  Auto Monitor (5s)
+                </Button>
               ) : (
-                <>
-                  <Sword className="w-4 h-4 mr-2" />
-                  Check Match Status
-                </>
+                <Button
+                  onClick={stopAutoMonitoring}
+                  className="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors"
+                  data-testid="stop-monitoring-btn"
+                >
+                  <Clock className="w-4 h-4 mr-2" />
+                  Stop Monitoring
+                </Button>
               )}
-            </Button>
+            </div>
 
             {lastChecked && (
               <div className="flex items-center gap-2 text-sm text-slate-400 justify-center">
