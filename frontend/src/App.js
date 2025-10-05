@@ -237,18 +237,37 @@ function App() {
   const OpponentCard = ({ opponent }) => {
     const playerRaceNum = getPlayerRaceNumber();
     
-    // Find opponent's winrate against my race
+    // Calculate opponent's TOTAL winrate AGAINST my race from hero stats
     const getOpponentWinrateVsMyRace = () => {
-      if (!opponent.basic_stats?.winLosses) return null;
+      if (!opponent.hero_stats?.heroStatsItemList) return null;
       
-      const vsMyRace = opponent.basic_stats.winLosses.find(wl => wl.race === playerRaceNum);
-      if (!vsMyRace || vsMyRace.games === 0) return null;
+      let totalWins = 0;
+      let totalLosses = 0;
+      
+      // Sum up all hero stats against my race
+      opponent.hero_stats.heroStatsItemList.forEach(heroStat => {
+        heroStat.stats?.forEach(stat => {
+          const overall = stat.winLossesOnMap?.find(wl => wl.map === "Overall");
+          if (overall) {
+            const vsMyRace = overall.winLosses?.find(wl => wl.race === playerRaceNum);
+            if (vsMyRace && vsMyRace.games > 0) {
+              totalWins += vsMyRace.wins;
+              totalLosses += vsMyRace.losses;
+            }
+          }
+        });
+      });
+      
+      const totalGames = totalWins + totalLosses;
+      if (totalGames === 0) return null;
+      
+      const winrate = Math.round((totalWins / totalGames) * 100);
       
       return {
-        winrate: Math.round(vsMyRace.winrate * 100),
-        wins: vsMyRace.wins,
-        losses: vsMyRace.losses,
-        games: vsMyRace.games
+        winrate,
+        wins: totalWins,
+        losses: totalLosses,
+        games: totalGames
       };
     };
 
