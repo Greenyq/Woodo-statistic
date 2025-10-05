@@ -234,7 +234,7 @@ async def get_demo_match():
     """Get demo match data with real W3Champions statistics"""
     try:
         # Use real player with actual stats
-        demo_battle_tag = "Clover#21325"
+        demo_battle_tag = "Siberia#21832"
         
         # Get real opponent statistics
         opponent_basic_stats = await get_player_statistics(demo_battle_tag)
