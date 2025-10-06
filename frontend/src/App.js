@@ -278,7 +278,7 @@ function App() {
       };
     };
 
-    const vsMyRaceStats = getOpponentWinrateVsMyRace();
+    const overallStats = getOpponentWinrateVsMyRace();
     
     return (
       <Card className="bg-slate-800/50 border-amber-600/30" data-testid={`opponent-card-${opponent.battle_tag}`}>
