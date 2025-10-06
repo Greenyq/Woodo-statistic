@@ -235,9 +235,7 @@ function App() {
   };
 
   const OpponentCard = ({ opponent }) => {
-    const playerRaceNum = getPlayerRaceNumber();
-    
-    // Calculate opponent's TOTAL winrate AGAINST my race from hero stats (filtered by opponent's race)
+    // Calculate opponent's TOTAL winrate from hero stats (filtered by opponent's race)
     const getOpponentWinrateVsMyRace = () => {
       if (!opponent.hero_stats?.heroStatsItemList) return null;
       
@@ -247,7 +245,7 @@ function App() {
       // Get heroes of opponent's race
       const opponentRaceHeroes = getHeroesByRace(opponent.race);
       
-      // Sum up hero stats against my race, but only for opponent's race heroes
+      // Sum up hero stats, but only for opponent's race heroes
       opponent.hero_stats.heroStatsItemList
         .filter(heroStat => {
           // Filter: only include heroes of opponent's race (or all if Random)
