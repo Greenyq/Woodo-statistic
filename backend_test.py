@@ -80,9 +80,7 @@ class W3ChampionsAPITester:
     def test_check_match_valid_input(self):
         """Test check-match with valid player input"""
         test_data = {
-            "nickname": "TestPlayer",
-            "battle_tag": "TestPlayer#1234",
-            "race": "Human"
+            "battle_tag": "TestPlayer#1234"
         }
         return self.run_test(
             "Check Match - Valid Input",
