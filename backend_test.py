@@ -93,9 +93,7 @@ class W3ChampionsAPITester:
     def test_check_match_invalid_battle_tag(self):
         """Test check-match with invalid battle tag format"""
         test_data = {
-            "nickname": "TestPlayer",
-            "battle_tag": "InvalidTag",
-            "race": "Human"
+            "battle_tag": "InvalidTag"
         }
         return self.run_test(
             "Check Match - Invalid Battle Tag",
