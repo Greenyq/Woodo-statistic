@@ -33,9 +33,7 @@ W3C_API_BASE = "https://website-backend.w3champions.com/api"
 
 # Define Models
 class PlayerInput(BaseModel):
-    nickname: str = Field(..., min_length=1, max_length=50)
     battle_tag: str = Field(..., min_length=1)
-    race: str = Field(..., pattern="^(Human|Orc|Night Elf|Undead|Random)$")
     
     @validator('battle_tag')
     def validate_battle_tag(cls, v):
