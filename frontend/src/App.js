@@ -28,13 +28,7 @@ function App() {
   const [autoMonitoring, setAutoMonitoring] = useState(false);
   const [intervalId, setIntervalId] = useState(null);
 
-  const races = [
-    { value: "Human", label: "Human", icon: "⚔️" },
-    { value: "Orc", label: "Orc", icon: "🪓" },
-    { value: "Night Elf", label: "Night Elf", icon: "🏹" },
-    { value: "Undead", label: "Undead", icon: "💀" },
-    { value: "Random", label: "Random", icon: "🎲" }
-  ];
+  // Races array removed - race icons now handled inline
 
   const handleInputChange = (field, value) => {
     console.log('Form change:', field, value);
