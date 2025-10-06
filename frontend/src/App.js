@@ -222,17 +222,6 @@ function App() {
     return herosByRace[race] || [];
   };
 
-  const getPlayerRaceNumber = () => {
-    const raceMap = {
-      "Human": 1,
-      "Orc": 2,
-      "Night Elf": 4,
-      "Undead": 8,
-      "Random": 16
-    };
-    return raceMap[playerData.race] || 1;
-  };
-
   const get_race_name_from_number = (raceNum) => {
     const raceMap = {
       0: "Random",
