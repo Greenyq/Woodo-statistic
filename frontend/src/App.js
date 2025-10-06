@@ -53,8 +53,8 @@ function App() {
   };
 
   const checkMatch = async (silent = false) => {
-    if (!playerData.nickname || !playerData.battle_tag || !playerData.race) {
-      setError("Please fill in all fields");
+    if (!playerData.battle_tag) {
+      setError("Please enter a battle tag");
       return;
     }
 
