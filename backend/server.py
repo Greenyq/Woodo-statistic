@@ -531,8 +531,6 @@ def analyze_player_achievements(basic_stats: dict, hero_stats: dict, recent_matc
             duration = match_result.get('durationInSeconds', 0)
             
             if duration > 0:
-                duration_minutes = duration / 60
-                
                 # Estimate economic performance based on game duration and result
                 won = match_result.get('won', False)
                 
