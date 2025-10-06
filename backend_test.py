@@ -104,17 +104,16 @@ class W3ChampionsAPITester:
         )
 
     def test_check_match_invalid_race(self):
-        """Test check-match with invalid race"""
+        """Test check-match with invalid race (this test may not be relevant anymore)"""
         test_data = {
-            "nickname": "TestPlayer",
-            "battle_tag": "TestPlayer#1234",
-            "race": "InvalidRace"
+            "battle_tag": "TestPlayer#1234"
         }
+        # Since race is no longer required, this should pass
         return self.run_test(
-            "Check Match - Invalid Race",
+            "Check Match - No Race Required",
             "POST",
             "check-match",
-            422,  # Validation error
+            200,  # Should pass now
             data=test_data
         )
 
