@@ -305,42 +305,122 @@ def analyze_player_achievements(basic_stats: dict, hero_stats: dict, recent_matc
                         "color": "yellow"
                     })
     
-    # 3. ACTIVITY ACHIEVEMENTS
+    # 3. ACTIVITY ACHIEVEMENTS  
     from datetime import datetime, timezone, timedelta
     
     if recent_matches and recent_matches.get('matches') and len(recent_matches['matches']) > 0:
         matches = recent_matches['matches']
         matches_count = len(matches)
         
-        # Player has recent activity
-        if matches_count >= 10:
+        # Analyze timestamps to determine recent activity patterns
+        now = datetime.now(timezone.utc)
+        today = now.date()
+        yesterday = today - timedelta(days=1)
+        last_week = now - timedelta(days=7)
+        
+        # Count matches in different time periods
+        today_matches = 0
+        yesterday_matches = 0
+        week_matches = 0
+        
+        for match in matches:
+            # Try to parse match timestamp - the API might have different field names
+            match_time = None
+            for time_field in ['startTime', 'timestamp', 'createdAt', 'endTime']:
+                if time_field in match and match[time_field]:
+                    try:
+                        # Handle different timestamp formats
+                        time_str = match[time_field]
+                        if isinstance(time_str, str):
+                            if 'T' in time_str:
+                                # ISO format
+                                match_time = datetime.fromisoformat(time_str.replace('Z', '+00:00'))
+                            else:
+                                # Try parsing as timestamp
+                                match_time = datetime.fromtimestamp(float(time_str), tz=timezone.utc)
+                        elif isinstance(time_str, (int, float)):
+                            # Unix timestamp
+                            match_time = datetime.fromtimestamp(time_str, tz=timezone.utc)
+                        break
+                    except (ValueError, TypeError):
+                        continue
+            
+            if match_time:
+                match_date = match_time.date()
+                if match_date == today:
+                    today_matches += 1
+                elif match_date == yesterday:
+                    yesterday_matches += 1
+                    
+                if match_time >= last_week:
+                    week_matches += 1
+        
+        # Determine activity level based on timestamp analysis
+        if today_matches >= 5:
             achievements.append({
                 "title": "🎮 Игроман",
-                "description": f"{matches_count} игр недавно - активный игрок",
+                "description": f"{today_matches} игр сегодня - не можешь оторваться!",
                 "type": "activity",
                 "color": "blue"
             })
-        elif matches_count >= 5:
+        elif today_matches >= 2:
             achievements.append({
                 "title": "🔥 В игре",
-                "description": f"{matches_count} игр недавно - в форме",
+                "description": f"{today_matches} игры сегодня - в форме",
                 "type": "activity",
                 "color": "green"
             })
-        elif matches_count >= 2:
+        elif today_matches == 1:
             achievements.append({
                 "title": "🌅 Начинаю день",
-                "description": f"{matches_count} игры сегодня",
+                "description": "1 игра сегодня",
                 "type": "activity",
                 "color": "green"
             })
-        else:  # 1 match
+        elif yesterday_matches > 0:
             achievements.append({
-                "title": "🎯 Разминка",
-                "description": "1 игра недавно",
+                "title": "🌙 Вчерашний боец",
+                "description": f"Последняя активность вчера ({yesterday_matches} игр)",
                 "type": "activity",
                 "color": "yellow"
             })
+        elif week_matches > 0:
+            achievements.append({
+                "title": "🎯 Разминка",
+                "description": f"{week_matches} игр на этой неделе",
+                "type": "activity",
+                "color": "yellow"
+            })
+        else:
+            # Fall back to simple count if no timestamps available
+            if matches_count >= 10:
+                achievements.append({
+                    "title": "🎮 Игроман",
+                    "description": f"{matches_count} игр недавно - активный игрок",
+                    "type": "activity",
+                    "color": "blue"
+                })
+            elif matches_count >= 5:
+                achievements.append({
+                    "title": "🔥 В игре", 
+                    "description": f"{matches_count} игр недавно - в форме",
+                    "type": "activity",
+                    "color": "green"
+                })
+            elif matches_count >= 2:
+                achievements.append({
+                    "title": "🌅 Начинаю день",
+                    "description": f"{matches_count} игры недавно",
+                    "type": "activity",
+                    "color": "green"
+                })
+            else:  # 1 match
+                achievements.append({
+                    "title": "🎯 Разминка",
+                    "description": "1 игра недавно",
+                    "type": "activity",
+                    "color": "yellow"
+                })
     else:
         # No recent matches - player is inactive
         achievements.append({
