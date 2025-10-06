@@ -151,6 +151,38 @@ async def search_matches(battle_tag: str, offset: int = 0, page_size: int = 10, 
     endpoint = f"matches/search?playerId={encoded_battle_tag}&gateway={gateway}&offset={offset}&pageSize={page_size}&season={season}"
     return await get_w3c_data(endpoint)
 
+async def get_recent_matches_smart(battle_tag: str, target_matches: int = 20) -> Optional[Dict]:
+    """Get recent matches across seasons to reach target number of matches"""
+    # Try current season (23) first
+    season_23_matches = await search_matches(battle_tag, 0, target_matches, 23)
+    
+    if season_23_matches and season_23_matches.get('matches'):
+        matches_23 = season_23_matches['matches']
+        
+        # If we have enough matches from season 23, return them
+        if len(matches_23) >= target_matches:
+            return {"matches": matches_23[:target_matches]}
+        
+        # If not enough matches, try to get more from season 22
+        remaining_needed = target_matches - len(matches_23)
+        season_22_matches = await search_matches(battle_tag, 0, remaining_needed, 22)
+        
+        if season_22_matches and season_22_matches.get('matches'):
+            matches_22 = season_22_matches['matches']
+            # Combine matches from both seasons
+            all_matches = matches_23 + matches_22
+            return {"matches": all_matches[:target_matches]}
+        
+        # Return what we have from season 23
+        return {"matches": matches_23}
+    
+    # If no matches in season 23, try season 22
+    season_22_matches = await search_matches(battle_tag, 0, target_matches, 22)
+    if season_22_matches and season_22_matches.get('matches'):
+        return {"matches": season_22_matches['matches'][:target_matches]}
+    
+    return None
+
 def get_race_number(race_name: str) -> int:
     """Convert race name to W3C race number"""
     race_map = {
