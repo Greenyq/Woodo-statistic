@@ -1,142 +1,184 @@
 {
   "summary": {
-    "tests_run": 22,
-    "tests_passed": 21,
-    "success_rate": 95.45454545454545,
-    "timestamp": "2025-10-05T16:05:02.020775"
+    "tests_run": 29,
+    "tests_passed": 29,
+    "success_rate": 100.0,
+    "timestamp": "2025-10-06T16:15:05.282706"
   },
   "test_results": [
     {
       "test_name": "API Root",
       "success": true,
       "details": "Status: 200, Response keys: ['message']",
-      "timestamp": "2025-10-05T16:04:56.392900"
+      "timestamp": "2025-10-06T16:14:30.794349"
     },
     {
       "test_name": "Check Match - Valid Input",
       "success": true,
       "details": "Status: 200, Response keys: ['status', 'message', 'data']",
-      "timestamp": "2025-10-05T16:04:56.992283"
+      "timestamp": "2025-10-06T16:14:31.383142"
     },
     {
       "test_name": "Player Stats",
       "success": true,
       "details": "Status: 200, Response keys: ['battle_tag', 'statistics', 'recent_matches']",
-      "timestamp": "2025-10-05T16:04:57.795183"
+      "timestamp": "2025-10-06T16:14:32.321338"
     },
     {
       "test_name": "Match History",
-      "success": false,
-      "details": "Expected 200, got 500. Response: Internal Server Error...",
-      "timestamp": "2025-10-05T16:04:57.834239"
+      "success": true,
+      "details": "Status: 200, Response keys: ['match_history']",
+      "timestamp": "2025-10-06T16:14:33.088691"
+    },
+    {
+      "test_name": "Demo Match Endpoint",
+      "success": true,
+      "details": "Status: 200, Response keys: ['status', 'message', 'data']",
+      "timestamp": "2025-10-06T16:14:34.754443"
+    },
+    {
+      "test_name": "Achievement System - Real Player (Siberia#21832)",
+      "success": true,
+      "details": "Status: 200, Response keys: ['status', 'message', 'data']",
+      "timestamp": "2025-10-06T16:14:46.264085"
+    },
+    {
+      "test_name": "Achievement Categories Analysis",
+      "success": true,
+      "details": "Status: 200, Response keys: ['status', 'message', 'data']",
+      "timestamp": "2025-10-06T16:14:47.906620"
+    },
+    {
+      "test_name": "Battle Tag Encoding - Standard ASCII",
+      "success": true,
+      "details": "Status: 200, Response keys: ['status', 'message', 'data']",
+      "timestamp": "2025-10-06T16:14:59.445446"
+    },
+    {
+      "test_name": "Battle Tag Encoding - Cyrillic characters",
+      "success": true,
+      "details": "Status: 200, Response keys: ['status', 'message', 'data']",
+      "timestamp": "2025-10-06T16:14:59.898090"
+    },
+    {
+      "test_name": "Battle Tag Encoding - 5-digit tag",
+      "success": true,
+      "details": "Status: 200, Response keys: ['status', 'message', 'data']",
+      "timestamp": "2025-10-06T16:15:00.329988"
+    },
+    {
+      "test_name": "Error Handling - Non-existent Player",
+      "success": true,
+      "details": "Status: 200, Response keys: ['status', 'message', 'data']",
+      "timestamp": "2025-10-06T16:15:00.794101"
     },
     {
       "test_name": "Check Match - Invalid Battle Tag",
       "success": true,
       "details": "Status: 422, Response keys: ['detail']",
-      "timestamp": "2025-10-05T16:04:57.867235"
+      "timestamp": "2025-10-06T16:15:00.846324"
     },
     {
       "test_name": "Check Match - Invalid Race",
       "success": true,
       "details": "Status: 422, Response keys: ['detail']",
-      "timestamp": "2025-10-05T16:04:57.906642"
+      "timestamp": "2025-10-06T16:15:00.884010"
     },
     {
       "test_name": "Check Match - Missing Fields",
       "success": true,
       "details": "Status: 422, Response keys: ['detail']",
-      "timestamp": "2025-10-05T16:04:57.939414"
+      "timestamp": "2025-10-06T16:15:00.925869"
     },
     {
       "test_name": "Race Validation - Human",
       "success": true,
       "details": "Status: 200, Response keys: ['status', 'message', 'data']",
-      "timestamp": "2025-10-05T16:04:58.391168"
+      "timestamp": "2025-10-06T16:15:01.519002"
     },
     {
       "test_name": "Race Validation - Orc",
       "success": true,
       "details": "Status: 200, Response keys: ['status', 'message', 'data']",
-      "timestamp": "2025-10-05T16:04:58.814681"
+      "timestamp": "2025-10-06T16:15:01.950448"
     },
     {
       "test_name": "Race Validation - Night Elf",
       "success": true,
       "details": "Status: 200, Response keys: ['status', 'message', 'data']",
-      "timestamp": "2025-10-05T16:04:59.233949"
+      "timestamp": "2025-10-06T16:15:02.404889"
     },
     {
       "test_name": "Race Validation - Undead",
       "success": true,
       "details": "Status: 200, Response keys: ['status', 'message', 'data']",
-      "timestamp": "2025-10-05T16:04:59.693628"
+      "timestamp": "2025-10-06T16:15:02.836401"
     },
     {
       "test_name": "Race Validation - Random",
       "success": true,
       "details": "Status: 200, Response keys: ['status', 'message', 'data']",
-      "timestamp": "2025-10-05T16:05:00.104507"
+      "timestamp": "2025-10-06T16:15:03.261736"
     },
     {
       "test_name": "Battle Tag Format - Valid 4-digit",
       "success": true,
       "details": "Status: 200, Response keys: ['status', 'message', 'data']",
-      "timestamp": "2025-10-05T16:05:00.522632"
+      "timestamp": "2025-10-06T16:15:03.679682"
     },
     {
       "test_name": "Battle Tag Format - Valid 5-digit",
       "success": true,
       "details": "Status: 200, Response keys: ['status', 'message', 'data']",
-      "timestamp": "2025-10-05T16:05:00.951093"
+      "timestamp": "2025-10-06T16:15:04.108455"
     },
     {
       "test_name": "Battle Tag Format - Valid with numbers",
       "success": true,
       "details": "Status: 200, Response keys: ['status', 'message', 'data']",
-      "timestamp": "2025-10-05T16:05:01.357919"
+      "timestamp": "2025-10-06T16:15:04.538936"
     },
     {
       "test_name": "Battle Tag Format - No # symbol",
       "success": true,
       "details": "Status: 422, Response keys: ['detail']",
-      "timestamp": "2025-10-05T16:05:01.412207"
+      "timestamp": "2025-10-06T16:15:04.596645"
     },
     {
       "test_name": "Battle Tag Format - 3 digits",
       "success": true,
       "details": "Status: 422, Response keys: ['detail']",
-      "timestamp": "2025-10-05T16:05:01.445041"
+      "timestamp": "2025-10-06T16:15:04.632146"
     },
     {
       "test_name": "Battle Tag Format - 6 digits",
       "success": true,
       "details": "Status: 422, Response keys: ['detail']",
-      "timestamp": "2025-10-05T16:05:01.479776"
+      "timestamp": "2025-10-06T16:15:04.708797"
     },
     {
       "test_name": "Battle Tag Format - Non-numeric after #",
       "success": true,
       "details": "Status: 422, Response keys: ['detail']",
-      "timestamp": "2025-10-05T16:05:01.514195"
+      "timestamp": "2025-10-06T16:15:04.787528"
     },
     {
       "test_name": "Battle Tag Format - Empty string",
       "success": true,
       "details": "Status: 422, Response keys: ['detail']",
-      "timestamp": "2025-10-05T16:05:01.547683"
+      "timestamp": "2025-10-06T16:15:04.821941"
     },
     {
       "test_name": "Battle Tag Format - No digits after #",
       "success": true,
       "details": "Status: 422, Response keys: ['detail']",
-      "timestamp": "2025-10-05T16:05:01.577682"
+      "timestamp": "2025-10-06T16:15:04.858853"
     },
     {
       "test_name": "W3Champions Integration",
       "success": true,
       "details": "Status: 200, Response keys: ['status', 'message', 'data']",
-      "timestamp": "2025-10-05T16:05:02.019832"
+      "timestamp": "2025-10-06T16:15:05.281712"
     }
   ]
 }
