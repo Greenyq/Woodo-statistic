@@ -293,29 +293,29 @@ function App() {
             </div>
             
             {/* MAIN FEATURE: Winrate vs My Race */}
-            {vsMyRaceStats && (
+            {overallStats && (
               <div className="text-right">
                 <div className={`text-2xl font-bold ${
-                  vsMyRaceStats.winrate >= 65 ? 'text-red-400' : 
-                  vsMyRaceStats.winrate >= 50 ? 'text-yellow-400' : 'text-green-400'
+                  overallStats.winrate >= 65 ? 'text-red-400' : 
+                  overallStats.winrate >= 50 ? 'text-yellow-400' : 'text-green-400'
                 }`}>
-                  {vsMyRaceStats.winrate}%
+                  {overallStats.winrate}%
                 </div>
                 <div className="text-xs text-slate-400">
                   vs {playerData.race}
                 </div>
                 <div className="text-xs text-slate-300">
-                  {vsMyRaceStats.wins}W-{vsMyRaceStats.losses}L
+                  {overallStats.wins}W-{overallStats.losses}L
                 </div>
               </div>
             )}
           </CardTitle>
           
           {/* Highlight section for winrate vs my race */}
-          {vsMyRaceStats && (
+          {overallStats && (
             <div className={`mt-3 p-3 rounded-lg border-2 ${
-              vsMyRaceStats.winrate >= 65 ? 'bg-red-600/10 border-red-600/30' : 
-              vsMyRaceStats.winrate >= 50 ? 'bg-yellow-600/10 border-yellow-600/30' : 'bg-green-600/10 border-green-600/30'
+              overallStats.winrate >= 65 ? 'bg-red-600/10 border-red-600/30' : 
+              overallStats.winrate >= 50 ? 'bg-yellow-600/10 border-yellow-600/30' : 'bg-green-600/10 border-green-600/30'
             }`}>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -326,32 +326,32 @@ function App() {
                 </div>
                 <div className="text-right">
                   <div className={`text-xl font-bold ${
-                    vsMyRaceStats.winrate >= 65 ? 'text-red-300' : 
-                    vsMyRaceStats.winrate >= 50 ? 'text-yellow-300' : 'text-green-300'
+                    overallStats.winrate >= 65 ? 'text-red-300' : 
+                    overallStats.winrate >= 50 ? 'text-yellow-300' : 'text-green-300'
                   }`}>
-                    {vsMyRaceStats.winrate}% против {playerData.race}
+                    {overallStats.winrate}% против {playerData.race}
                   </div>
                   <div className="text-sm text-slate-300">
-                    {vsMyRaceStats.games} матчей против вас, {vsMyRaceStats.wins}W-{vsMyRaceStats.losses}L
+                    {overallStats.games} матчей против вас, {overallStats.wins}W-{overallStats.losses}L
                   </div>
                 </div>
               </div>
               
               <div className="mt-2 text-sm">
-                {vsMyRaceStats.winrate >= 65 && (
-                  <span className="text-red-300 font-semibold">🚨 КРИТИЧЕСКАЯ УГРОЗА! {vsMyRaceStats.winrate}% против {playerData.race} - будьте осторожны!</span>
+                {overallStats.winrate >= 65 && (
+                  <span className="text-red-300 font-semibold">🚨 КРИТИЧЕСКАЯ УГРОЗА! {overallStats.winrate}% против {playerData.race} - будьте осторожны!</span>
                 )}
-                {vsMyRaceStats.winrate >= 50 && vsMyRaceStats.winrate < 65 && (
-                  <span className="text-yellow-300 font-semibold">⚠️ СРЕДНЯЯ УГРОЗА! {vsMyRaceStats.winrate}% против {playerData.race} - стабильный противник</span>
+                {overallStats.winrate >= 50 && overallStats.winrate < 65 && (
+                  <span className="text-yellow-300 font-semibold">⚠️ СРЕДНЯЯ УГРОЗА! {overallStats.winrate}% против {playerData.race} - стабильный противник</span>
                 )}
-                {vsMyRaceStats.winrate < 50 && (
-                  <span className="text-green-300 font-semibold">✅ УЯЗВИМОСТЬ! Всего {vsMyRaceStats.winrate}% против {playerData.race} - используйте это!</span>
+                {overallStats.winrate < 50 && (
+                  <span className="text-green-300 font-semibold">✅ УЯЗВИМОСТЬ! Всего {overallStats.winrate}% против {playerData.race} - используйте это!</span>
                 )}
               </div>
             </div>
           )}
           
-          {!vsMyRaceStats && (
+          {!overallStats && (
             <div className="mt-3 p-3 rounded-lg bg-slate-700/30 border border-slate-600/30">
               <span className="text-slate-400 text-sm">
                 📊 Нет данных против {playerData.race}
