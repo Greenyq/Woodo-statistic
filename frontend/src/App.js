@@ -750,7 +750,7 @@ function App() {
             {matchStatus && matchStatus.status === "in_game" && matchStatus.data && matchStatus.data.opponent_data && matchStatus.data.opponent_data.opponents && matchStatus.data.opponent_data.opponents.length > 0 && (
               <div className="space-y-6">
                 <div className="text-center">
-                  <h2 className="text-2xl font-bold text-amber-400 mb-2">🎯 Анализ Противника - ПРОТИВ {playerData.race}</h2>
+                  <h2 className="text-2xl font-bold text-amber-400 mb-2">🎯 Анализ Противника</h2>
                   <div className="flex items-center justify-center gap-2 mb-4">
                     <Badge className="bg-blue-600/20 text-blue-300 border-blue-600/30">
                       📊 Показана статистика только {matchStatus.data.opponent_data.opponents[0]?.race} героев
