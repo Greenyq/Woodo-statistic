@@ -332,7 +332,7 @@ function App() {
                     {overallStats.winrate}% винрейт
                   </div>
                   <div className="text-sm text-slate-300">
-                    {overallStats.games} матчей против вас, {overallStats.wins}W-{overallStats.losses}L
+                    {overallStats.games} матчей всего, {overallStats.wins}W-{overallStats.losses}L
                   </div>
                 </div>
               </div>
