@@ -797,7 +797,7 @@ async def get_player_stats(battle_tag: str):
     """Get detailed player statistics"""
     try:
         stats = await get_player_statistics(battle_tag)
-        matches = await search_matches(battle_tag, 0, 50)
+        matches = await get_recent_matches_smart(battle_tag, 50)
         
         return {
             "battle_tag": battle_tag,
