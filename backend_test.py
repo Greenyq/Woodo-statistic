@@ -641,6 +641,14 @@ class W3ChampionsAPITester:
         self.test_battle_tag_encoding()
         self.test_error_handling()
         
+        # NEW FEATURES TESTS (Review Request Focus)
+        print("\n🆕 NEW FEATURES TESTS")
+        print("=" * 40)
+        self.test_multi_season_hero_data()
+        self.test_smart_recent_matches()
+        self.test_multi_race_achievement_logic()
+        self.test_updated_endpoints_integration()
+        
         # Validation tests
         print("\n🔍 VALIDATION TESTS")
         print("=" * 40)
