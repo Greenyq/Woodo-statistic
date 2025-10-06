@@ -385,6 +385,85 @@ def analyze_player_achievements(basic_stats: dict, hero_stats: dict, recent_matc
                         "color": "blue"
                     })
     
+    # 7. ECONOMIC ACHIEVEMENTS (based on game patterns)
+    if recent_matches and recent_matches.get('matches'):
+        matches = recent_matches['matches']
+        if len(matches) > 0:
+            recent_match = matches[0]  # Most recent match
+            duration = recent_match.get('durationInSeconds', 0)
+            
+            if duration > 0:
+                duration_minutes = duration / 60
+                
+                # Estimate economic performance based on game duration and result
+                won = recent_match.get('won', False)
+                
+                # Short wins suggest good economy (rush/fast expand success)
+                if duration < 600 and won:  # Less than 10 minutes and won
+                    achievements.append({
+                        "title": "💰 Экономический гений",
+                        "description": "Быстрая победа - отличная экономика",
+                        "type": "economy",
+                        "color": "green"
+                    })
+                # Very long losses suggest poor economy
+                elif duration > 1800 and not won:  # More than 30 minutes and lost
+                    achievements.append({
+                        "title": "💸 Не умеет добывать",
+                        "description": "Долгое поражение - слабая экономика", 
+                        "type": "economy",
+                        "color": "red"
+                    })
+                # Long wins suggest good late game economy
+                elif duration > 1200 and won:  # More than 20 minutes and won
+                    achievements.append({
+                        "title": "🏦 Скупердяй",
+                        "description": "Долгая победа - накопил ресурсы",
+                        "type": "economy", 
+                        "color": "blue"
+                    })
+                # Short losses suggest poor early economy
+                elif duration < 480 and not won:  # Less than 8 minutes and lost
+                    achievements.append({
+                        "title": "💔 Бомж",
+                        "description": "Быстрое поражение - нет экономики",
+                        "type": "economy",
+                        "color": "red"
+                    })
+                # Medium duration games
+                elif 600 <= duration <= 1200:
+                    if won:
+                        achievements.append({
+                            "title": "⚖️ Сбалансированный",
+                            "description": "Стабильная экономика",
+                            "type": "economy",
+                            "color": "green"
+                        })
+            
+            # Special economy achievements based on multiple matches
+            if len(matches) >= 5:
+                # Check if player consistently wins short games (good economy)
+                short_wins = sum(1 for m in matches[:5] 
+                               if m.get('durationInSeconds', 0) < 600 and m.get('won', False))
+                if short_wins >= 3:
+                    achievements.append({
+                        "title": "⚡ Экономический раш",
+                        "description": "Мастер быстрой экономики",
+                        "type": "economy",
+                        "color": "yellow"
+                    })
+                
+                # Check if player often loses long games (poor late economy)
+                long_losses = sum(1 for m in matches[:5]
+                                if m.get('durationInSeconds', 0) > 1200 and not m.get('won', False))
+                if long_losses >= 3:
+                    achievements.append({
+                        "title": "🐌 Медленно копит",
+                        "description": "Слабая поздняя экономика",
+                        "type": "economy", 
+                        "color": "red"
+                    })
+    
     return achievements
 
 # Routes
