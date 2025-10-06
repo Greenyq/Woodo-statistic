@@ -477,22 +477,53 @@ def analyze_player_achievements(basic_stats: dict, hero_stats: dict, recent_matc
     
     # 5. RACE DIVERSITY ACHIEVEMENTS
     if basic_stats and basic_stats.get('winLosses'):
-        races_played = [wl for wl in basic_stats['winLosses'] if wl.get('games', 0) >= 10]
-        if len(races_played) >= 4:
-            achievements.append({
-                "title": "🌈 Мульти-рейсер",
-                "description": f"Играет за {len(races_played)} рас",
-                "type": "diversity",
-                "color": "yellow"
-            })
-        elif len(races_played) == 1:
-            # Find the main race
-            main_race_num = races_played[0]['race']
-            race_names = {1: "Human", 2: "Orc", 4: "Night Elf", 8: "Undead", 0: "Random"}
-            race_name = race_names.get(main_race_num, "Unknown")
+        # Calculate race distribution balance
+        race_games = {}
+        total_games = 0
+        race_names_map = {1: "Human", 2: "Orc", 4: "Night Elf", 8: "Undead", 0: "Random"}
+        
+        for wl in basic_stats['winLosses']:
+            games = wl.get('games', 0)
+            if games >= 5:  # Only count races with at least 5 games
+                race_num = wl.get('race', 0)
+                race_name = race_names_map.get(race_num, f"Race_{race_num}")
+                race_games[race_name] = games
+                total_games += games
+        
+        if len(race_games) >= 3 and total_games >= 50:  # Minimum requirements
+            # Check if races are balanced (within 20-30% of each other)
+            max_games = max(race_games.values())
+            min_games = min(race_games.values())
+            
+            # Calculate if distribution is balanced (max race shouldn't be more than 150% of min race)
+            balance_ratio = min_games / max_games if max_games > 0 else 0
+            
+            if balance_ratio >= 0.5:  # Within 50% range = balanced enough
+                # Calculate percentages for description
+                percentages = {race: round((games/total_games)*100) for race, games in race_games.items()}
+                race_list = list(percentages.keys())[:4]  # Show up to 4 races
+                
+                achievements.append({
+                    "title": "🌈 Мульти-рейсер",
+                    "description": f"Сбалансированная игра за {len(race_games)} рас ({total_games} игр)",
+                    "type": "diversity",
+                    "color": "yellow"
+                })
+            elif len(race_games) >= 4:
+                # Has many races but not balanced
+                achievements.append({
+                    "title": "🎭 Экспериментатор", 
+                    "description": f"Пробует разные расы: {len(race_games)} рас",
+                    "type": "diversity",
+                    "color": "blue"
+                })
+        elif len(race_games) == 1:
+            # Specialist - plays only one race
+            main_race = list(race_games.keys())[0]
+            main_games = race_games[main_race]
             achievements.append({
                 "title": "🎯 Специалист",
-                "description": f"Играет только за {race_name}",
+                "description": f"Играет только за {main_race} ({main_games} игр)",
                 "type": "focus",
                 "color": "blue"
             })
