@@ -258,19 +258,40 @@ def analyze_player_achievements(basic_stats: dict, hero_stats: dict, recent_matc
                     })
     
     # 3. ACTIVITY ACHIEVEMENTS
+    from datetime import datetime, timezone, timedelta
+    
     if recent_matches and recent_matches.get('matches'):
-        from datetime import datetime, timezone, timedelta
-        today = datetime.now(timezone.utc).date()
+        matches = recent_matches['matches']
         
-        # Check if player played today (if we had match timestamps)
-        # For now, if no recent matches, assume inactive
-        if len(recent_matches['matches']) == 0:
+        # If no recent matches or very few, player is inactive
+        if len(matches) == 0:
             achievements.append({
                 "title": "😴 Только проснулся",
-                "description": "Давно не играл",
+                "description": "Нет недавних игр",
                 "type": "activity", 
                 "color": "yellow"
             })
+        elif len(matches) <= 2:
+            achievements.append({
+                "title": "🌅 Начинаю день",
+                "description": "Мало игр сегодня",
+                "type": "activity",
+                "color": "green"
+            })
+        elif len(matches) >= 10:
+            achievements.append({
+                "title": "🎮 Игроман",
+                "description": f"{len(matches)} игр недавно",
+                "type": "activity",
+                "color": "blue"
+            })
+    else:
+        achievements.append({
+            "title": "😴 Только проснулся", 
+            "description": "Нет недавних игр",
+            "type": "activity",
+            "color": "yellow"
+        })
     
     # 4. SKILL & EXPERIENCE ACHIEVEMENTS
     if basic_stats and basic_stats.get('winLosses'):
