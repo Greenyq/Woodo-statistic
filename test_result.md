@@ -144,6 +144,54 @@ backend:
         agent: "testing"
         comment: "TESTED: Activity achievements working correctly. Tested with real players and demo match - all show proper activity achievements (🎮 Игроман, 🔥 В игре, 🌅 Начинаю день, 🌙 Вчерашний боец, 🎯 Разминка, 😴 Только проснулся). Timestamp parsing handles multiple field formats as implemented. Activity categorization works for today/yesterday/week patterns with proper fallback to match count."
 
+  - task: "Multi-Race Achievement Logic"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "TESTED: New balanced race distribution achievement logic working correctly. The 'Мульти-рейсер' achievement now uses 50% balance ratio instead of simple race count. Found 'Экспериментатор' achievement for players with multiple races. Balance calculation properly checks min_games/max_games ratio >= 0.5 for balanced distribution."
+
+  - task: "Multi-Season Hero Data Integration"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "TESTED: Multi-season hero data integration working correctly. get_player_hero_stats_multi_season() function successfully combines data from both season 22 and 23. Demo match shows 16 heroes found from merged seasons, providing better coverage than single season data."
+
+  - task: "Smart Recent Matches Functionality"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "TESTED: Smart recent matches functionality working correctly. get_recent_matches_smart() function successfully tries season 23 first, falls back to season 22, and combines matches to reach target count. Verified with Siberia#21832 - retrieved 50 matches spanning multiple seasons. Backend logs show proper API calls to both seasons."
+
+  - task: "Updated Endpoints Integration"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "TESTED: All endpoints successfully using new functions. /api/check-match uses get_recent_matches_smart and get_player_hero_stats_multi_season, /api/demo-match works with updated functions showing proper hero stats and achievements, /api/player-stats/{battle_tag} uses smart match retrieval. All endpoints return proper data structures with multi-season integration."
+
 frontend:
   - task: "Achievement Display System"
     implemented: true
