@@ -478,7 +478,18 @@ class W3ChampionsAPITester:
         self.test_player_stats_endpoint()
         self.test_match_history_endpoint()
         
+        # Achievement System Tests (Focus of this review)
+        print("\n🎯 ACHIEVEMENT SYSTEM TESTS")
+        print("=" * 40)
+        self.test_demo_match_endpoint()
+        self.test_achievement_system_with_real_player()
+        self.test_achievement_categories()
+        self.test_battle_tag_encoding()
+        self.test_error_handling()
+        
         # Validation tests
+        print("\n🔍 VALIDATION TESTS")
+        print("=" * 40)
         self.test_check_match_invalid_battle_tag()
         self.test_check_match_invalid_race()
         self.test_check_match_missing_fields()
