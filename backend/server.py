@@ -107,6 +107,42 @@ async def get_player_hero_stats(battle_tag: str, season: int = 23) -> Optional[D
     endpoint = f"player-stats/{battle_tag}/hero-on-map-versus-race?season={season}"
     return await get_w3c_data(endpoint)
 
+async def get_player_hero_stats_multi_season(battle_tag: str) -> Optional[Dict]:
+    """Get hero statistics from both season 22 and 23 for better coverage"""
+    season_23_stats = await get_player_hero_stats(battle_tag, 23)
+    season_22_stats = await get_player_hero_stats(battle_tag, 22)
+    
+    if not season_23_stats and not season_22_stats:
+        return None
+    
+    # Merge stats from both seasons
+    merged_stats = {"heroStatsItemList": []}
+    
+    # Combine hero stats from both seasons
+    hero_data = {}
+    
+    # Process season 23 data
+    if season_23_stats and season_23_stats.get('heroStatsItemList'):
+        for hero_stat in season_23_stats['heroStatsItemList']:
+            hero_id = hero_stat.get('heroId')
+            if hero_id:
+                hero_data[hero_id] = hero_stat
+    
+    # Add season 22 data (merge if hero exists, add if not)
+    if season_22_stats and season_22_stats.get('heroStatsItemList'):
+        for hero_stat in season_22_stats['heroStatsItemList']:
+            hero_id = hero_stat.get('heroId')
+            if hero_id:
+                if hero_id in hero_data:
+                    # Merge stats (this is complex, for now just keep season 23 as primary)
+                    pass
+                else:
+                    # Add hero from season 22 if not in season 23
+                    hero_data[hero_id] = hero_stat
+    
+    merged_stats['heroStatsItemList'] = list(hero_data.values())
+    return merged_stats
+
 async def search_matches(battle_tag: str, offset: int = 0, page_size: int = 10, season: int = 23, gateway: int = 20) -> Optional[Dict]:
     """Search recent matches for a player using new API"""
     # URL encode the battle tag for the playerId parameter
