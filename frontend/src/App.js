@@ -255,11 +255,12 @@ function App() {
           heroStat.stats?.forEach(stat => {
             const overall = stat.winLossesOnMap?.find(wl => wl.map === "Overall");
             if (overall) {
-              const vsMyRace = overall.winLosses?.find(wl => wl.race === playerRaceNum);
-              if (vsMyRace && vsMyRace.games > 0) {
-                totalWins += vsMyRace.wins;
-                totalLosses += vsMyRace.losses;
-              }
+              overall.winLosses?.forEach(wl => {
+                if (wl.games > 0) {
+                  totalWins += wl.wins;
+                  totalLosses += wl.losses;
+                }
+              });
             }
           });
         });
