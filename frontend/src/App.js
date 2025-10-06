@@ -110,11 +110,9 @@ function App() {
     setError(""); // Clear any existing errors
     
     try {
-      // FORCE React state update first
+      // Set battle tag for demo
       const demoPlayerData = {
-        nickname: "DemoPlayer", 
-        battle_tag: "DemoPlayer#1234",
-        race: "Human"
+        battle_tag: "DemoPlayer#1234"
       };
       
       // Force state update and wait for it
@@ -125,17 +123,9 @@ function App() {
       
       // FORCE DOM update as backup
       setTimeout(() => {
-        if (nicknameRef.current) {
-          nicknameRef.current.value = demoPlayerData.nickname;
-          nicknameRef.current.dispatchEvent(new Event('input', { bubbles: true }));
-        }
         if (battleTagRef.current) {
           battleTagRef.current.value = demoPlayerData.battle_tag;  
           battleTagRef.current.dispatchEvent(new Event('input', { bubbles: true }));
-        }
-        if (raceRef.current) {
-          raceRef.current.value = demoPlayerData.race;
-          raceRef.current.dispatchEvent(new Event('change', { bubbles: true }));
         }
       }, 150);
       
