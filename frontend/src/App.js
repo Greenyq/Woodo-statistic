@@ -509,12 +509,12 @@ function App() {
                             </Badge>
                           </div>
                           <div className="text-right">
-                            <div className={`font-semibold ${vsYourRaceStats.winrate > 0.6 ? 'text-red-400' : 
-                              vsYourRaceStats.winrate > 0.4 ? 'text-yellow-400' : 'text-green-400'}`}>
-                              {Math.round(vsYourRaceStats.winrate * 100)}%
+                            <div className={`font-semibold ${totalWins / totalGames > 0.6 ? 'text-red-400' : 
+                              totalWins / totalGames > 0.4 ? 'text-yellow-400' : 'text-green-400'}`}>
+                              {Math.round((totalWins / totalGames) * 100)}%
                             </div>
                             <div className="text-xs text-slate-400">
-                              {vsYourRaceStats.wins}W-{vsYourRaceStats.losses}L
+                              {totalWins}W-{totalLosses}L
                             </div>
                           </div>
                         </div>
