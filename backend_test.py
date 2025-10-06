@@ -181,9 +181,7 @@ class W3ChampionsAPITester:
         all_passed = True
         for battle_tag, should_pass, description in test_cases:
             test_data = {
-                "nickname": "TestPlayer",
-                "battle_tag": battle_tag,
-                "race": "Human"
+                "battle_tag": battle_tag
             }
             expected_status = 200 if should_pass else 422
             success, _ = self.run_test(
