@@ -228,7 +228,7 @@ def analyze_player_achievements(basic_stats: dict, hero_stats: dict, recent_matc
                 if main_hero in hero_achievements and games_count >= 10:
                     achievements.append({
                         "title": hero_achievements[main_hero],
-                        "description": f"Основной герой {player_race}: {games_count} игр",
+                        "description": f"Основной герой: {main_hero} ({games_count} игр)",
                         "type": "hero",
                         "color": "blue"
                     })
