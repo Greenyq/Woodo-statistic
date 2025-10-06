@@ -275,32 +275,41 @@ def analyze_player_achievements(basic_stats: dict, hero_stats: dict, recent_matc
     # 3. ACTIVITY ACHIEVEMENTS
     from datetime import datetime, timezone, timedelta
     
-    if recent_matches and recent_matches.get('matches'):
+    if recent_matches and recent_matches.get('matches') and len(recent_matches['matches']) > 0:
         matches = recent_matches['matches']
+        matches_count = len(matches)
         
-        # If no recent matches or very few, player is inactive
-        if len(matches) == 0:
-            achievements.append({
-                "title": "😴 Только проснулся",
-                "description": "Нет недавних игр",
-                "type": "activity", 
-                "color": "yellow"
-            })
-        elif len(matches) <= 2:
-            achievements.append({
-                "title": "🌅 Начинаю день",
-                "description": "Мало игр сегодня",
-                "type": "activity",
-                "color": "green"
-            })
-        elif len(matches) >= 10:
+        # Player has recent activity
+        if matches_count >= 10:
             achievements.append({
                 "title": "🎮 Игроман",
-                "description": f"{len(matches)} игр недавно",
+                "description": f"{matches_count} игр недавно - активный игрок",
                 "type": "activity",
                 "color": "blue"
             })
+        elif matches_count >= 5:
+            achievements.append({
+                "title": "🔥 В игре",
+                "description": f"{matches_count} игр недавно - в форме",
+                "type": "activity",
+                "color": "green"
+            })
+        elif matches_count >= 2:
+            achievements.append({
+                "title": "🌅 Начинаю день",
+                "description": f"{matches_count} игры сегодня",
+                "type": "activity",
+                "color": "green"
+            })
+        else:  # 1 match
+            achievements.append({
+                "title": "🎯 Разминка",
+                "description": "1 игра недавно",
+                "type": "activity",
+                "color": "yellow"
+            })
     else:
+        # No recent matches - player is inactive
         achievements.append({
             "title": "😴 Только проснулся", 
             "description": "Нет недавних игр",
