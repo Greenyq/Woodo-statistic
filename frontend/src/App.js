@@ -16,15 +16,11 @@ const API = `${BACKEND_URL}/api`;
 
 function App() {
   const [playerData, setPlayerData] = useState({
-    nickname: "",
-    battle_tag: "",
-    race: ""
+    battle_tag: ""
   });
   
-  // Add refs for direct DOM manipulation as fallback
-  const nicknameRef = useRef(null);
+  // Add ref for direct DOM manipulation as fallback
   const battleTagRef = useRef(null);
-  const raceRef = useRef(null);
   const [loading, setLoading] = useState(false);
   const [matchStatus, setMatchStatus] = useState(null);
   const [error, setError] = useState("");
