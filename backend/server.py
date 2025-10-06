@@ -211,23 +211,51 @@ def analyze_player_achievements(basic_stats: dict, hero_stats: dict, recent_matc
     if recent_matches and recent_matches.get('matches'):
         matches = recent_matches['matches']
         if len(matches) >= 3:
-            # Check last 3 matches for streaks
-            last_3 = [match.get('won', False) for match in matches[:3]]
+            # Check for win/loss streaks from most recent matches
+            streak_count = 0
+            streak_type = None
             
-            if all(last_3):  # 3 wins in a row
-                achievements.append({
-                    "title": "🔥 Я в огне!",
-                    "description": "3 победы подряд",
-                    "type": "streak",
-                    "color": "red"
-                })
-            elif not any(last_3):  # 3 losses in a row
-                achievements.append({
-                    "title": "😤 Это все интернет!",
-                    "description": "3 поражения подряд", 
-                    "type": "streak",
-                    "color": "gray"
-                })
+            # Count consecutive wins or losses from the beginning
+            for match in matches:
+                won = match.get('won', False)
+                if streak_type is None:
+                    streak_type = won
+                    streak_count = 1
+                elif streak_type == won:
+                    streak_count += 1
+                else:
+                    break
+            
+            if streak_count >= 3:
+                if streak_type:  # Win streak
+                    achievements.append({
+                        "title": "🔥 Я в огне!",
+                        "description": f"{streak_count} побед подряд",
+                        "type": "streak",
+                        "color": "red"
+                    })
+                else:  # Loss streak
+                    achievements.append({
+                        "title": "😤 Это все интернет!",
+                        "description": f"{streak_count} поражения подряд", 
+                        "type": "streak",
+                        "color": "gray"
+                    })
+            elif streak_count == 2:
+                if streak_type:
+                    achievements.append({
+                        "title": "🎯 На волне",
+                        "description": "2 победы подряд",
+                        "type": "streak", 
+                        "color": "yellow"
+                    })
+                else:
+                    achievements.append({
+                        "title": "😠 Невезет",
+                        "description": "2 поражения подряд",
+                        "type": "streak",
+                        "color": "yellow"
+                    })
     
     # 3. ACTIVITY ACHIEVEMENTS
     if recent_matches and recent_matches.get('matches'):
