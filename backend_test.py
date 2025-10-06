@@ -150,27 +150,19 @@ class W3ChampionsAPITester:
         )
 
     def test_race_validation(self):
-        """Test all valid races"""
-        valid_races = ["Human", "Orc", "Night Elf", "Undead", "Random"]
-        all_passed = True
+        """Test that race is no longer required (simplified API)"""
+        test_data = {
+            "battle_tag": "TestPlayer#1234"
+        }
+        success, _ = self.run_test(
+            "Race No Longer Required",
+            "POST",
+            "check-match",
+            200,
+            data=test_data
+        )
         
-        for race in valid_races:
-            test_data = {
-                "nickname": "TestPlayer",
-                "battle_tag": "TestPlayer#1234",
-                "race": race
-            }
-            success, _ = self.run_test(
-                f"Race Validation - {race}",
-                "POST",
-                "check-match",
-                200,
-                data=test_data
-            )
-            if not success:
-                all_passed = False
-        
-        return all_passed
+        return success
 
     def test_battle_tag_formats(self):
         """Test various battle tag formats"""
