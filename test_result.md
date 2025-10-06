@@ -120,6 +120,9 @@ backend:
         agent: "main"
         comment: "Fixed economic achievement logic to use determine_match_result() function consistently. Updated special economy achievements to properly parse match results from new API format. Needs testing."
       - working: true
+        agent: "main"
+        comment: "FIXED achievement descriptions - now shows hero names (e.g. 'Основной герой: demonhunter') instead of race names. Economic and activity achievements working correctly with new API integration."
+      - working: true
         agent: "testing"
         comment: "TESTED: Economic achievements working correctly. Tested with real player Siberia#21832 and found multiple opponents with economy achievements (💰 Экономический гений, 💸 Не умеет добывать, 🏦 Скупердяй, ⚡ Экономический раш, 🐌 Медленно копит). The determine_match_result() function properly parses match results and duration for economic analysis. Achievement categories include proper titles, descriptions, types, and colors."
         
