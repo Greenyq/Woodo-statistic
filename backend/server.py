@@ -501,8 +501,20 @@ def analyze_player_achievements(basic_stats: dict, hero_stats: dict, recent_matc
             # Special economy achievements based on multiple matches
             if len(matches) >= 5:
                 # Check if player consistently wins short games (good economy)
-                short_wins = sum(1 for m in matches[:5] 
-                               if m.get('durationInSeconds', 0) < 600 and m.get('won', False))
+                short_wins = 0
+                long_losses = 0
+                
+                for m in matches[:5]:
+                    match_result = determine_match_result(m, player_battle_tag)
+                    duration = match_result.get('durationInSeconds', 0)
+                    won = match_result.get('won')
+                    
+                    if won is not None:  # Only count matches where we can determine the result
+                        if duration < 600 and won:
+                            short_wins += 1
+                        elif duration > 1200 and not won:
+                            long_losses += 1
+                
                 if short_wins >= 3:
                     achievements.append({
                         "title": "⚡ Экономический раш",
@@ -511,9 +523,6 @@ def analyze_player_achievements(basic_stats: dict, hero_stats: dict, recent_matc
                         "color": "yellow"
                     })
                 
-                # Check if player often loses long games (poor late economy)
-                long_losses = sum(1 for m in matches[:5]
-                                if m.get('durationInSeconds', 0) > 1200 and not m.get('won', False))
                 if long_losses >= 3:
                     achievements.append({
                         "title": "🐌 Медленно копит",
