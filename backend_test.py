@@ -396,9 +396,7 @@ class W3ChampionsAPITester:
         all_passed = True
         for battle_tag, description in test_cases:
             test_data = {
-                "nickname": "TestPlayer",
-                "battle_tag": battle_tag,
-                "race": "Human"
+                "battle_tag": battle_tag
             }
             
             success, response = self.run_test(
