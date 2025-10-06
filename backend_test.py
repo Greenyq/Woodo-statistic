@@ -120,11 +120,10 @@ class W3ChampionsAPITester:
     def test_check_match_missing_fields(self):
         """Test check-match with missing required fields"""
         test_data = {
-            "nickname": "TestPlayer"
-            # Missing battle_tag and race
+            # Missing battle_tag - this should fail
         }
         return self.run_test(
-            "Check Match - Missing Fields",
+            "Check Match - Missing Battle Tag",
             "POST",
             "check-match",
             422,  # Validation error
