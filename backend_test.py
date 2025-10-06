@@ -200,9 +200,7 @@ class W3ChampionsAPITester:
         """Test integration with real W3Champions API"""
         # Test with a known player (this might not be in game, but should return valid response)
         test_data = {
-            "nickname": "TestPlayer",
-            "battle_tag": "Dantas#1378",  # Example from the API docs
-            "race": "Human"
+            "battle_tag": "Dantas#1378"  # Example from the API docs
         }
         success, response = self.run_test(
             "W3Champions Integration",
