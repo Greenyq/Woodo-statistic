@@ -239,6 +239,230 @@ class W3ChampionsAPITester:
         
         return success
 
+    def test_demo_match_endpoint(self):
+        """Test demo-match endpoint and verify achievements are returned"""
+        success, response = self.run_test(
+            "Demo Match Endpoint",
+            "GET",
+            "demo-match",
+            200
+        )
+        
+        if success and response:
+            # Verify demo match structure
+            if "data" in response and "opponent_data" in response["data"]:
+                opponents = response["data"]["opponent_data"].get("opponents", [])
+                if opponents and len(opponents) > 0:
+                    opponent = opponents[0]
+                    if "achievements" in opponent:
+                        achievements = opponent["achievements"]
+                        print(f"   ✅ Demo match has {len(achievements)} achievements")
+                        
+                        # Check achievement structure
+                        if achievements:
+                            first_achievement = achievements[0]
+                            required_keys = ["title", "description", "type", "color"]
+                            if all(key in first_achievement for key in required_keys):
+                                print(f"   ✅ Achievement structure valid")
+                            else:
+                                print(f"   ⚠️  Achievement missing required keys")
+                        return True
+                    else:
+                        print(f"   ❌ No achievements found in demo match")
+                        return False
+                else:
+                    print(f"   ❌ No opponents found in demo match")
+                    return False
+            else:
+                print(f"   ❌ Demo match missing expected data structure")
+                return False
+        
+        return success
+
+    def test_achievement_system_with_real_player(self):
+        """Test achievement system with real player battle tag"""
+        # Use Siberia#21832 as requested in the review
+        test_data = {
+            "nickname": "Siberia",
+            "battle_tag": "Siberia#21832",
+            "race": "Night Elf"
+        }
+        
+        success, response = self.run_test(
+            "Achievement System - Real Player (Siberia#21832)",
+            "POST",
+            "check-match",
+            200,
+            data=test_data
+        )
+        
+        if success and response:
+            # Check if we get achievement data (either in match or not in match)
+            status = response.get("status")
+            print(f"   Player status: {status}")
+            
+            if status == "in_game" and "data" in response:
+                # Player is in game - check opponent achievements
+                opponent_data = response["data"].get("opponent_data", {})
+                opponents = opponent_data.get("opponents", [])
+                
+                if opponents:
+                    for i, opponent in enumerate(opponents):
+                        achievements = opponent.get("achievements", [])
+                        print(f"   Opponent {i+1} ({opponent.get('battle_tag', 'Unknown')}): {len(achievements)} achievements")
+                        
+                        # Validate achievement types
+                        achievement_types = set()
+                        for achievement in achievements:
+                            achievement_types.add(achievement.get("type", "unknown"))
+                        
+                        print(f"   Achievement types found: {list(achievement_types)}")
+                        
+                        # Check for specific achievement categories mentioned in review
+                        expected_types = ["activity", "economy", "streak", "hero", "skill", "experience"]
+                        found_expected = [t for t in expected_types if t in achievement_types]
+                        if found_expected:
+                            print(f"   ✅ Found expected achievement types: {found_expected}")
+                        else:
+                            print(f"   ⚠️  No expected achievement types found")
+                
+                return True
+            elif status == "not_in_game":
+                print(f"   ✅ Player not in game - this is expected behavior")
+                return True
+            else:
+                print(f"   ⚠️  Unexpected response structure")
+                return False
+        
+        return success
+
+    def test_achievement_categories(self):
+        """Test that different achievement categories are working correctly"""
+        # Test with demo match to ensure we get achievements
+        success, response = self.run_test(
+            "Achievement Categories Analysis",
+            "GET", 
+            "demo-match",
+            200
+        )
+        
+        if success and response:
+            # Extract achievements from demo match
+            opponents = response.get("data", {}).get("opponent_data", {}).get("opponents", [])
+            if not opponents:
+                print(f"   ❌ No opponents in demo match")
+                return False
+                
+            achievements = opponents[0].get("achievements", [])
+            if not achievements:
+                print(f"   ❌ No achievements found")
+                return False
+            
+            # Analyze achievement categories
+            categories = {}
+            for achievement in achievements:
+                category = achievement.get("type", "unknown")
+                if category not in categories:
+                    categories[category] = []
+                categories[category].append(achievement)
+            
+            print(f"   Found {len(achievements)} total achievements in {len(categories)} categories:")
+            
+            # Check specific categories mentioned in review request
+            expected_categories = {
+                "economy": "Economic achievements",
+                "activity": "Activity achievements", 
+                "streak": "Win/loss streak achievements",
+                "hero": "Hero main achievements",
+                "skill": "Skill-based achievements",
+                "experience": "Experience achievements"
+            }
+            
+            all_good = True
+            for category, description in expected_categories.items():
+                if category in categories:
+                    count = len(categories[category])
+                    print(f"   ✅ {description}: {count} achievements")
+                    
+                    # Validate structure of first achievement in category
+                    first_achievement = categories[category][0]
+                    required_fields = ["title", "description", "type", "color"]
+                    if all(field in first_achievement for field in required_fields):
+                        print(f"      Structure valid: {first_achievement['title']}")
+                    else:
+                        print(f"      ⚠️  Missing required fields")
+                        all_good = False
+                else:
+                    print(f"   ⚠️  {description}: Not found")
+            
+            # Check for any unexpected categories
+            unexpected = set(categories.keys()) - set(expected_categories.keys())
+            if unexpected:
+                print(f"   Additional categories found: {list(unexpected)}")
+            
+            return all_good
+        
+        return success
+
+    def test_battle_tag_encoding(self):
+        """Test that battle tag encoding works properly for special characters"""
+        # Test with Cyrillic characters as mentioned in the code
+        test_cases = [
+            ("Siberia#21832", "Standard ASCII"),
+            ("Тест#1234", "Cyrillic characters"),
+            ("Player#12345", "5-digit tag"),
+        ]
+        
+        all_passed = True
+        for battle_tag, description in test_cases:
+            test_data = {
+                "nickname": "TestPlayer",
+                "battle_tag": battle_tag,
+                "race": "Human"
+            }
+            
+            success, response = self.run_test(
+                f"Battle Tag Encoding - {description}",
+                "POST",
+                "check-match", 
+                200,
+                data=test_data
+            )
+            
+            if not success:
+                all_passed = False
+        
+        return all_passed
+
+    def test_error_handling(self):
+        """Test error handling for invalid battle tags and API failures"""
+        # Test with non-existent battle tag
+        test_data = {
+            "nickname": "NonExistent",
+            "battle_tag": "NonExistentPlayer#9999",
+            "race": "Human"
+        }
+        
+        success, response = self.run_test(
+            "Error Handling - Non-existent Player",
+            "POST",
+            "check-match",
+            200,  # Should still return 200 but with not_in_game status
+            data=test_data
+        )
+        
+        if success and response:
+            # Should gracefully handle non-existent player
+            status = response.get("status")
+            if status == "not_in_game":
+                print(f"   ✅ Gracefully handled non-existent player")
+                return True
+            else:
+                print(f"   ⚠️  Unexpected status for non-existent player: {status}")
+                return False
+        
+        return success
+
     def run_all_tests(self):
         """Run all backend tests"""
         print("🚀 Starting W3Champions Match Scout Backend Tests")
