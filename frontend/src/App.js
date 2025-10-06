@@ -476,19 +476,25 @@ function App() {
                     return opponent.race === "Random" || opponentRaceHeroes.includes(heroStat.heroId);
                   })
                   .map((heroStat, idx) => {
-                    // Find stats for this hero against your race
-                    const heroVsYourRace = heroStat.stats.find(stat => 
-                      stat.winLossesOnMap.some(mapStat => 
-                        mapStat.winLosses.some(winLoss => winLoss.race === playerRaceNum && winLoss.games > 0)
-                      )
+                    // Find overall stats for this hero
+                    const heroOverallStats = heroStat.stats.find(stat => 
+                      stat.winLossesOnMap.some(mapStat => mapStat.map === "Overall")
                     );
                     
-                    if (!heroVsYourRace) return null;
+                    if (!heroOverallStats) return null;
                     
-                    const overallStats = heroVsYourRace.winLossesOnMap.find(map => map.map === "Overall");
-                    const vsYourRaceStats = overallStats?.winLosses.find(wl => wl.race === playerRaceNum);
+                    const overallMap = heroOverallStats.winLossesOnMap.find(map => map.map === "Overall");
+                    if (!overallMap || !overallMap.winLosses) return null;
                     
-                    if (!vsYourRaceStats || vsYourRaceStats.games === 0) return null;
+                    // Sum all races for overall hero stats
+                    let totalWins = 0, totalLosses = 0, totalGames = 0;
+                    overallMap.winLosses.forEach(wl => {
+                      totalWins += wl.wins || 0;
+                      totalLosses += wl.losses || 0;
+                      totalGames += wl.games || 0;
+                    });
+                    
+                    if (totalGames === 0) return null;
                     
                     return (
                       <div key={idx} className="bg-slate-700/50 p-3 rounded-lg border-l-4 border-amber-600/50">
