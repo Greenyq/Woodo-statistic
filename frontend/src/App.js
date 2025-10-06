@@ -345,7 +345,7 @@ function App() {
                   <span className="text-yellow-300 font-semibold">⚠️ СРЕДНЯЯ УГРОЗА! {overallStats.winrate}% винрейт - стабильный противник</span>
                 )}
                 {overallStats.winrate < 50 && (
-                  <span className="text-green-300 font-semibold">✅ УЯЗВИМОСТЬ! Всего {overallStats.winrate}% против {playerData.race} - используйте это!</span>
+                  <span className="text-green-300 font-semibold">✅ УЯЗВИМОСТЬ! Всего {overallStats.winrate}% винрейт - используйте это!</span>
                 )}
               </div>
             </div>
