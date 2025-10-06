@@ -443,17 +443,18 @@ def analyze_player_achievements(basic_stats: dict, hero_stats: dict, recent_matc
                     })
     
     # 7. ECONOMIC ACHIEVEMENTS (based on game patterns)
-    if recent_matches and recent_matches.get('matches'):
+    if recent_matches and recent_matches.get('matches') and player_battle_tag:
         matches = recent_matches['matches']
         if len(matches) > 0:
             recent_match = matches[0]  # Most recent match
-            duration = recent_match.get('durationInSeconds', 0)
+            match_result = determine_match_result(recent_match, player_battle_tag)
+            duration = match_result.get('durationInSeconds', 0)
             
             if duration > 0:
                 duration_minutes = duration / 60
                 
                 # Estimate economic performance based on game duration and result
-                won = recent_match.get('won', False)
+                won = match_result.get('won', False)
                 
                 # Short wins suggest good economy (rush/fast expand success)
                 if duration < 600 and won:  # Less than 10 minutes and won
