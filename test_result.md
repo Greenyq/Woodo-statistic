@@ -107,11 +107,11 @@ user_problem_statement: Complete W3Champions match scout application by finalizi
 backend:
   - task: "Economic Achievements Integration"
     implemented: true  
-    working: false
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: false
         agent: "main"
@@ -119,14 +119,17 @@ backend:
       - working: false
         agent: "main"
         comment: "Fixed economic achievement logic to use determine_match_result() function consistently. Updated special economy achievements to properly parse match results from new API format. Needs testing."
+      - working: true
+        agent: "testing"
+        comment: "TESTED: Economic achievements working correctly. Tested with real player Siberia#21832 and found multiple opponents with economy achievements (💰 Экономический гений, 💸 Не умеет добывать, 🏦 Скупердяй, ⚡ Экономический раш, 🐌 Медленно копит). The determine_match_result() function properly parses match results and duration for economic analysis. Achievement categories include proper titles, descriptions, types, and colors."
         
   - task: "Activity Achievements with Timestamps"
     implemented: true
-    working: false  
+    working: true  
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: false
         agent: "main"
@@ -134,6 +137,9 @@ backend:
       - working: false
         agent: "main"
         comment: "Implemented timestamp-based activity detection. Added parsing for multiple timestamp field formats (startTime, timestamp, createdAt, endTime). Activity achievements now analyze today/yesterday/week patterns with fallback to match count. Needs testing."
+      - working: true
+        agent: "testing"
+        comment: "TESTED: Activity achievements working correctly. Tested with real players and demo match - all show proper activity achievements (🎮 Игроман, 🔥 В игре, 🌅 Начинаю день, 🌙 Вчерашний боец, 🎯 Разминка, 😴 Только проснулся). Timestamp parsing handles multiple field formats as implemented. Activity categorization works for today/yesterday/week patterns with proper fallback to match count."
 
 frontend:
   - task: "Achievement Display System"
