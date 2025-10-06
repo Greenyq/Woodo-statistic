@@ -624,48 +624,17 @@ function App() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="nickname" className="text-slate-200">Nickname</Label>
-                <Input
-                  id="nickname"
-                  ref={nicknameRef}
-                  data-testid="nickname-input"
-                  placeholder="Enter your nickname"
-                  value={playerData.nickname}
-                  onChange={(e) => handleInputChange("nickname", e.target.value)}
-                  className="bg-slate-700 border-slate-600 text-white placeholder-slate-400"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="battle-tag" className="text-slate-200">Battle Tag</Label>
-                <Input
-                  id="battle-tag"
-                  ref={battleTagRef}
-                  data-testid="battle-tag-input"
-                  placeholder="PlayerName#1234"
-                  value={playerData.battle_tag}
-                  onChange={(e) => handleInputChange("battle_tag", e.target.value)}
-                  className="bg-slate-700 border-slate-600 text-white placeholder-slate-400"
-                />
-              </div>
-            </div>
             <div className="space-y-2">
-              <Label className="text-slate-200">Race</Label>
-              <select
-                ref={raceRef}
-                data-testid="race-selector"
-                value={playerData.race}
-                onChange={(e) => handleInputChange("race", e.target.value)}
-                className="w-full bg-slate-700 border border-slate-600 text-white rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-amber-600"
-              >
-                <option value="">Select your race</option>
-                {races.map(race => (
-                  <option key={race.value} value={race.value}>
-                    {race.icon} {race.label}
-                  </option>
-                ))}
-              </select>
+              <Label htmlFor="battle-tag" className="text-slate-200">Battle Tag</Label>
+              <Input
+                id="battle-tag"
+                ref={battleTagRef}
+                data-testid="battle-tag-input"
+                placeholder="PlayerName#1234"
+                value={playerData.battle_tag}
+                onChange={(e) => handleInputChange("battle_tag", e.target.value)}
+                className="bg-slate-700 border-slate-600 text-white placeholder-slate-400"
+              />
             </div>
 
             {error && (
