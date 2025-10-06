@@ -642,7 +642,6 @@ async def check_player_match(player_input: PlayerInput):
         
         # Player is in match - extract opponent info
         opponents = []
-        player_race_num = get_race_number(player_input.race)
         
         # Find opponents (players that are not the queried player)
         for team in match_data.get("teams", []):
