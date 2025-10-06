@@ -153,6 +153,21 @@ frontend:
       - working: true
         agent: "main"
         comment: "Achievement display component working correctly, showing achievements with colors and icons"
+      - working: true
+        agent: "main"
+        comment: "Updated UI - removed nickname and race selector, removed debug match status, fixed achievement descriptions to show hero names instead of races. All working correctly."
+        
+  - task: "UI Simplification"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "COMPLETED: Removed nickname field, removed race selector (race taken from match), removed debug match status display. Form now only has battle tag field. Backend updated to not require nickname/race fields."
 
 metadata:
   created_by: "main_agent"
