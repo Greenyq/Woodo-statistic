@@ -832,10 +832,10 @@ async def get_demo_match():
         # Get real opponent statistics
         opponent_basic_stats = await get_player_statistics(demo_battle_tag)
         opponent_race_stats = await get_player_race_stats(demo_battle_tag)
-        opponent_matches = await search_matches(demo_battle_tag, 0, 10)
+        opponent_matches = await get_recent_matches_smart(demo_battle_tag, 20)
         
-        # Use real recent matches - new API should provide data
-        opponent_hero_stats = await get_player_hero_stats(demo_battle_tag)
+        # Use real recent matches with multi-season hero data
+        opponent_hero_stats = await get_player_hero_stats_multi_season(demo_battle_tag)
         
         # Analyze achievements
         opponent_achievements = analyze_player_achievements(
