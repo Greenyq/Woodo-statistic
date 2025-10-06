@@ -139,7 +139,32 @@ def get_race_name(race_number: int) -> str:
     }
     return race_map.get(race_number, "Unknown")
 
-def analyze_player_achievements(basic_stats: dict, hero_stats: dict, recent_matches: dict, player_race: str = None) -> list:
+def determine_match_result(match_data: dict, player_battle_tag: str) -> dict:
+    """Determine if player won the match and extract hero info from new API format"""
+    if not match_data.get('teams'):
+        return {"won": None, "heroUsed": None, "map": match_data.get("mapName", "Unknown")}
+    
+    # Find which team the player was on and if they won
+    player_team_won = None
+    hero_used = None
+    
+    for team in match_data['teams']:
+        for player in team.get('players', []):
+            if player.get('battleTag') == player_battle_tag:
+                player_team_won = team.get('won', False)
+                hero_used = player.get('heroId', 'Unknown')
+                break
+        if player_team_won is not None:
+            break
+    
+    return {
+        "won": player_team_won,
+        "heroUsed": hero_used,
+        "map": match_data.get("mapName", "Unknown"),
+        "durationInSeconds": match_data.get("durationInSeconds", 0)
+    }
+
+def analyze_player_achievements(basic_stats: dict, hero_stats: dict, recent_matches: dict, player_race: str = None, player_battle_tag: str = None) -> list:
     """Analyze player data and return list of achievements/badges"""
     achievements = []
     
