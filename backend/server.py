@@ -748,7 +748,8 @@ async def get_demo_match():
             opponent_basic_stats, 
             opponent_hero_stats, 
             opponent_matches,
-            "Night Elf"  # Siberia#21832 is Night Elf main
+            "Night Elf",  # Siberia#21832 is Night Elf main
+            demo_battle_tag
         )
         
         demo_match_data = {
