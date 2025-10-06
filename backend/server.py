@@ -616,9 +616,8 @@ async def get_demo_match():
         opponent_race_stats = await get_player_race_stats(demo_battle_tag)
         opponent_matches = await search_matches(demo_battle_tag, 0, 10)
         
-        # Add demo recent matches for testing achievements
-        if not opponent_matches or not opponent_matches.get('matches'):
-            opponent_matches = {
+        # Add demo recent matches for testing achievements (always override for demo)
+        opponent_matches = {
                 "matches": [
                     {
                         "map": "Lost Temple",
