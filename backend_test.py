@@ -265,9 +265,7 @@ class W3ChampionsAPITester:
         """Test achievement system with real player battle tag"""
         # Use Siberia#21832 as requested in the review
         test_data = {
-            "nickname": "Siberia",
-            "battle_tag": "Siberia#21832",
-            "race": "Night Elf"
+            "battle_tag": "Siberia#21832"
         }
         
         success, response = self.run_test(
