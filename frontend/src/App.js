@@ -422,6 +422,61 @@ function App() {
           )}
         </CardHeader>
         <CardContent className="space-y-6">
+          {/* LAST MATCH ANALYSIS */}
+          {opponent.recent_matches?.matches?.[0] && (
+            <div className="p-3 rounded-lg bg-gradient-to-r from-blue-600/10 to-cyan-600/10 border border-blue-600/30">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-lg">🎯</span>
+                <span className="font-semibold text-blue-300">Последняя игра</span>
+              </div>
+              {(() => {
+                const lastMatch = opponent.recent_matches.matches[0];
+                const duration = lastMatch.durationInSeconds || 0;
+                const minutes = Math.round(duration / 60);
+                const won = lastMatch.won;
+                
+                // Analyze economy based on duration and result
+                let economyStatus = "";
+                if (duration < 600 && won) {
+                  economyStatus = "💰 Отличная экономика (быстрая победа)";
+                } else if (duration > 1800 && !won) {
+                  economyStatus = "💸 Слабая экономика (долгое поражение)";
+                } else if (duration > 1200 && won) {
+                  economyStatus = "🏦 Накопил ресурсы (долгая победа)";
+                } else if (duration < 480 && !won) {
+                  economyStatus = "💔 Нет экономики (быстрое поражение)";
+                } else {
+                  economyStatus = "⚖️ Стандартная экономика";
+                }
+                
+                return (
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="text-amber-300 font-medium">{lastMatch.map}</span>
+                        <Badge className={won ? "bg-green-600/20 text-green-300" : "bg-red-600/20 text-red-300"}>
+                          {won ? "Победа" : "Поражение"}
+                        </Badge>
+                      </div>
+                      <span className="text-slate-300 text-sm">{minutes} мин</span>
+                    </div>
+                    <div className="text-sm">
+                      <span className="text-slate-400">Герой: </span>
+                      <span className="text-white">{getHeroIcon(lastMatch.heroUsed?.toLowerCase())} {lastMatch.heroUsed}</span>
+                    </div>
+                    <div className={`text-sm font-medium ${
+                      economyStatus.includes('💰') ? 'text-green-300' :
+                      economyStatus.includes('💸') || economyStatus.includes('💔') ? 'text-red-300' :
+                      economyStatus.includes('🏦') ? 'text-blue-300' : 'text-yellow-300'
+                    }`}>
+                      {economyStatus}
+                    </div>
+                  </div>
+                );
+              })()}
+            </div>
+          )}
+          
           {/* Hero Statistics vs Your Race */}
           {opponent.hero_stats?.heroStatsItemList && (
             <div className="space-y-3">
