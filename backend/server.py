@@ -567,9 +567,6 @@ def analyze_player_achievements(basic_stats: dict, hero_stats: dict, recent_matc
             balance_ratio = min_games / max_games if max_games > 0 else 0
             
             if balance_ratio >= 0.5:  # Within 50% range = balanced enough
-                # Calculate percentages for description
-                percentages = {race: round((games/total_games)*100) for race, games in race_games.items()}
-                
                 achievements.append({
                     "title": "🌈 Мульти-рейсер",
                     "description": f"Сбалансированная игра за {len(race_games)} рас ({total_games} игр)",
