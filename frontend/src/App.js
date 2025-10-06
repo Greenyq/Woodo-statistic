@@ -329,7 +329,7 @@ function App() {
                     overallStats.winrate >= 65 ? 'text-red-300' : 
                     overallStats.winrate >= 50 ? 'text-yellow-300' : 'text-green-300'
                   }`}>
-                    {overallStats.winrate}% против {playerData.race}
+                    {overallStats.winrate}% винрейт
                   </div>
                   <div className="text-sm text-slate-300">
                     {overallStats.games} матчей против вас, {overallStats.wins}W-{overallStats.losses}L
