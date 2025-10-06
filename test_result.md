@@ -106,7 +106,7 @@ user_problem_statement: Complete W3Champions match scout application by finalizi
 
 backend:
   - task: "Economic Achievements Integration"
-    implemented: false  
+    implemented: true  
     working: false
     file: "/app/backend/server.py"
     stuck_count: 0
@@ -116,9 +116,12 @@ backend:
       - working: false
         agent: "main"
         comment: "Economic achievement logic in analyze_player_achievements function needs updates for new API format. Currently has bugs with match result parsing and winner detection."
+      - working: false
+        agent: "main"
+        comment: "Fixed economic achievement logic to use determine_match_result() function consistently. Updated special economy achievements to properly parse match results from new API format. Needs testing."
         
   - task: "Activity Achievements with Timestamps"
-    implemented: false
+    implemented: true
     working: false  
     file: "/app/backend/server.py"
     stuck_count: 0
@@ -128,6 +131,9 @@ backend:
       - working: false
         agent: "main"
         comment: "Activity achievements need to use actual match timestamps from new matches/search API instead of just match count. Need proper recent activity detection."
+      - working: false
+        agent: "main"
+        comment: "Implemented timestamp-based activity detection. Added parsing for multiple timestamp field formats (startTime, timestamp, createdAt, endTime). Activity achievements now analyze today/yesterday/week patterns with fallback to match count. Needs testing."
 
 frontend:
   - task: "Achievement Display System"
