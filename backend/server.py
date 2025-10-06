@@ -226,7 +226,22 @@ def analyze_player_achievements(basic_stats: dict, hero_stats: dict, recent_matc
                 else:
                     break
             
-            if streak_count >= 3:
+            if streak_count >= 5:
+                if streak_type:  # Win streak
+                    achievements.append({
+                        "title": "🚀 Неудержимый!",
+                        "description": f"{streak_count} побед подряд - легенда!",
+                        "type": "streak",
+                        "color": "purple"
+                    })
+                else:  # Loss streak  
+                    achievements.append({
+                        "title": "💀 Катастрофа",
+                        "description": f"{streak_count} поражений подряд - кошмар!",
+                        "type": "streak", 
+                        "color": "red"
+                    })
+            elif streak_count >= 3:
                 if streak_type:  # Win streak
                     achievements.append({
                         "title": "🔥 Я в огне!",
