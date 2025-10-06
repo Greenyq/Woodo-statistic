@@ -664,7 +664,8 @@ async def check_player_match(player_input: PlayerInput):
                             opponent_basic_stats, 
                             opponent_hero_stats, 
                             opponent_matches,
-                            opponent_race
+                            opponent_race,
+                            opponent_tag
                         )
                         
                         opponents.append({
