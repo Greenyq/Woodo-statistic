@@ -521,19 +521,26 @@ function App() {
                         
                         {/* Map specific stats */}
                         <div className="space-y-1">
-                          {heroVsYourRace.winLossesOnMap.filter(mapStat => 
-                            mapStat.map !== "Overall" && 
-                            mapStat.winLosses.some(wl => wl.race === playerRaceNum && wl.games > 0)
+                          {heroOverallStats.winLossesOnMap.filter(mapStat => 
+                            mapStat.map !== "Overall" && mapStat.winLosses && mapStat.winLosses.length > 0
                           ).slice(0, 3).map((mapStat, mapIdx) => {
-                            const mapVsYou = mapStat.winLosses.find(wl => wl.race === playerRaceNum);
-                            if (!mapVsYou || mapVsYou.games === 0) return null;
+                            // Calculate total for all races on this map
+                            let mapWins = 0, mapLosses = 0, mapGames = 0;
+                            mapStat.winLosses.forEach(wl => {
+                              mapWins += wl.wins || 0;
+                              mapLosses += wl.losses || 0;
+                              mapGames += wl.games || 0;
+                            });
+                            
+                            if (mapGames === 0) return null;
+                            const mapWinrate = mapWins / mapGames;
                             
                             return (
                               <div key={mapIdx} className="text-xs flex justify-between text-slate-300">
                                 <span className="truncate max-w-32">{mapStat.map.replace(/^\d+/, '').replace(/v\d+_\d+$/, '')}</span>
-                                <span className={mapVsYou.winrate > 0.6 ? 'text-red-300' : 
-                                  mapVsYou.winrate > 0.4 ? 'text-yellow-300' : 'text-green-300'}>
-                                  {Math.round(mapVsYou.winrate * 100)}% ({mapVsYou.games})
+                                <span className={mapWinrate > 0.6 ? 'text-red-300' : 
+                                  mapWinrate > 0.4 ? 'text-yellow-300' : 'text-green-300'}>
+                                  {Math.round(mapWinrate * 100)}% ({mapGames})
                                 </span>
                               </div>
                             );
