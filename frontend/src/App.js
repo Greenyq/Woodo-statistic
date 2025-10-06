@@ -169,8 +169,14 @@ function App() {
   }, [intervalId]);
 
   const getRaceIcon = (raceName) => {
-    const race = races.find(r => r.value === raceName);
-    return race?.icon || "❓";
+    const raceIcons = {
+      "Human": "⚔️",
+      "Orc": "🪓", 
+      "Night Elf": "🏹",
+      "Undead": "💀",
+      "Random": "🎲"
+    };
+    return raceIcons[raceName] || "❓";
   };
 
   const formatWinRate = (wins, losses) => {
