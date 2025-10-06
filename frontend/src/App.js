@@ -79,8 +79,8 @@ function App() {
   };
 
   const startAutoMonitoring = () => {
-    if (!playerData.nickname || !playerData.battle_tag || !playerData.race) {
-      setError("Please fill in all fields before starting auto-monitoring");
+    if (!playerData.battle_tag) {
+      setError("Please enter a battle tag before starting auto-monitoring");
       return;
     }
 
