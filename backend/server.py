@@ -606,6 +606,44 @@ async def get_demo_match():
         opponent_basic_stats = await get_player_statistics(demo_battle_tag)
         opponent_race_stats = await get_player_race_stats(demo_battle_tag)
         opponent_matches = await search_matches(demo_battle_tag, 0, 10)
+        
+        # Add demo recent matches for testing achievements
+        if not opponent_matches or not opponent_matches.get('matches'):
+            opponent_matches = {
+                "matches": [
+                    {
+                        "map": "Lost Temple",
+                        "won": True,
+                        "durationInSeconds": 420,  # 7 minutes - fast win
+                        "heroUsed": "DemonHunter"
+                    },
+                    {
+                        "map": "Concealed Hill", 
+                        "won": True,
+                        "durationInSeconds": 380,  # 6.3 minutes - fast win
+                        "heroUsed": "DemonHunter"
+                    },
+                    {
+                        "map": "Northern Isles",
+                        "won": True, 
+                        "durationInSeconds": 520,  # 8.7 minutes - fast win
+                        "heroUsed": "DemonHunter"
+                    },
+                    {
+                        "map": "Shallow Grave",
+                        "won": True,
+                        "durationInSeconds": 350,  # 5.8 minutes - very fast win
+                        "heroUsed": "DemonHunter"
+                    },
+                    {
+                        "map": "Tidehunters", 
+                        "won": False,
+                        "durationInSeconds": 1950,  # 32.5 minutes - long loss
+                        "heroUsed": "Warden"
+                    }
+                ],
+                "count": 5
+            }
         opponent_hero_stats = await get_player_hero_stats(demo_battle_tag)
         
         # Analyze achievements
