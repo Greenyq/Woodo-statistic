@@ -236,7 +236,7 @@ def analyze_player_achievements(basic_stats: dict, hero_stats: dict, recent_matc
                     })
     
     # 2. WIN/LOSS STREAK ACHIEVEMENTS  
-    if recent_matches and recent_matches.get('matches'):
+    if recent_matches and recent_matches.get('matches') and player_battle_tag:
         matches = recent_matches['matches']
         if len(matches) >= 3:
             # Check for win/loss streaks from most recent matches
@@ -245,7 +245,12 @@ def analyze_player_achievements(basic_stats: dict, hero_stats: dict, recent_matc
             
             # Count consecutive wins or losses from the beginning
             for match in matches:
-                won = match.get('won', False)
+                match_result = determine_match_result(match, player_battle_tag)
+                won = match_result.get('won')
+                
+                if won is None:  # Skip matches where result is unclear
+                    continue
+                    
                 if streak_type is None:
                     streak_type = won
                     streak_count = 1
