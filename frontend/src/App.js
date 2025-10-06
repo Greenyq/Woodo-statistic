@@ -339,7 +339,7 @@ function App() {
               
               <div className="mt-2 text-sm">
                 {overallStats.winrate >= 65 && (
-                  <span className="text-red-300 font-semibold">🚨 КРИТИЧЕСКАЯ УГРОЗА! {overallStats.winrate}% против {playerData.race} - будьте осторожны!</span>
+                  <span className="text-red-300 font-semibold">🚨 КРИТИЧЕСКАЯ УГРОЗА! {overallStats.winrate}% винрейт - будьте осторожны!</span>
                 )}
                 {overallStats.winrate >= 50 && overallStats.winrate < 65 && (
                   <span className="text-yellow-300 font-semibold">⚠️ СРЕДНЯЯ УГРОЗА! {overallStats.winrate}% против {playerData.race} - стабильный противник</span>
