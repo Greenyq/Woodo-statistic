@@ -99,7 +99,7 @@ async def get_player_statistics(battle_tag: str) -> Optional[Dict]:
     endpoint = f"players/{battle_tag}"
     return await get_w3c_data(endpoint)
 
-async def get_player_race_stats(battle_tag: str, gateway: int = 20, season: int = 22) -> Optional[Dict]:
+async def get_player_race_stats(battle_tag: str, gateway: int = 20, season: int = 23) -> Optional[Dict]:
     """Get player race statistics with detailed breakdown"""
     endpoint = f"players/{battle_tag}/race-stats?gateWay={gateway}&season={season}"
     return await get_w3c_data(endpoint)
