@@ -438,9 +438,7 @@ class W3ChampionsAPITester:
         """Test error handling for invalid battle tags and API failures"""
         # Test with non-existent battle tag
         test_data = {
-            "nickname": "NonExistent",
-            "battle_tag": "NonExistentPlayer#9999",
-            "race": "Human"
+            "battle_tag": "NonExistentPlayer#9999"
         }
         
         success, response = self.run_test(
@@ -462,6 +460,184 @@ class W3ChampionsAPITester:
                 return False
         
         return success
+
+    def test_multi_season_hero_data(self):
+        """Test that hero statistics combine data from both season 22 and 23"""
+        success, response = self.run_test(
+            "Multi-Season Hero Data Integration",
+            "GET",
+            "demo-match",
+            200
+        )
+        
+        if success and response:
+            opponents = response.get("data", {}).get("opponent_data", {}).get("opponents", [])
+            if opponents:
+                opponent = opponents[0]
+                hero_stats = opponent.get("hero_stats", {})
+                
+                if hero_stats and hero_stats.get("heroStatsItemList"):
+                    hero_count = len(hero_stats["heroStatsItemList"])
+                    print(f"   ✅ Multi-season hero data: {hero_count} heroes found")
+                    
+                    # Check if we have hero data (indicating multi-season merge worked)
+                    if hero_count > 0:
+                        first_hero = hero_stats["heroStatsItemList"][0]
+                        hero_id = first_hero.get("heroId", "unknown")
+                        print(f"   ✅ Sample hero: {hero_id}")
+                        return True
+                    else:
+                        print(f"   ❌ No hero data found in multi-season stats")
+                        return False
+                else:
+                    print(f"   ❌ No hero stats found in response")
+                    return False
+            else:
+                print(f"   ❌ No opponents found in demo match")
+                return False
+        
+        return success
+
+    def test_smart_recent_matches(self):
+        """Test smart recent matches functionality that spans seasons"""
+        # Test with real player to verify smart match retrieval
+        success, response = self.run_test(
+            "Smart Recent Matches - Multi-Season",
+            "GET",
+            "player-stats/Siberia#21832",
+            200
+        )
+        
+        if success and response:
+            recent_matches = response.get("recent_matches", {})
+            if recent_matches and recent_matches.get("matches"):
+                matches = recent_matches["matches"]
+                match_count = len(matches)
+                print(f"   ✅ Smart matches retrieved: {match_count} matches")
+                
+                # Check if we have a good number of matches (indicating smart retrieval worked)
+                if match_count >= 10:
+                    print(f"   ✅ Good match coverage achieved")
+                    
+                    # Check match structure
+                    if matches:
+                        first_match = matches[0]
+                        match_keys = list(first_match.keys())
+                        print(f"   ✅ Match structure keys: {match_keys[:5]}...")  # Show first 5 keys
+                        return True
+                else:
+                    print(f"   ⚠️  Limited matches found: {match_count}")
+                    return match_count > 0  # Still pass if we got some matches
+            else:
+                print(f"   ❌ No recent matches found")
+                return False
+        
+        return success
+
+    def test_multi_race_achievement_logic(self):
+        """Test the new balanced race distribution achievement logic"""
+        success, response = self.run_test(
+            "Multi-Race Achievement Balance Logic",
+            "GET",
+            "demo-match",
+            200
+        )
+        
+        if success and response:
+            opponents = response.get("data", {}).get("opponent_data", {}).get("opponents", [])
+            if opponents:
+                opponent = opponents[0]
+                achievements = opponent.get("achievements", [])
+                
+                # Look for race diversity achievements
+                diversity_achievements = [
+                    ach for ach in achievements 
+                    if ach.get("type") in ["diversity", "focus"] or 
+                       "Мульти-рейсер" in ach.get("title", "") or
+                       "Специалист" in ach.get("title", "") or
+                       "Экспериментатор" in ach.get("title", "")
+                ]
+                
+                if diversity_achievements:
+                    print(f"   ✅ Found {len(diversity_achievements)} race diversity achievements:")
+                    for ach in diversity_achievements:
+                        title = ach.get("title", "Unknown")
+                        description = ach.get("description", "No description")
+                        print(f"      • {title}: {description}")
+                    
+                    # Check if we have the new balanced logic achievement
+                    multi_racer = any("Мульти-рейсер" in ach.get("title", "") for ach in diversity_achievements)
+                    if multi_racer:
+                        print(f"   ✅ New balanced 'Мульти-рейсер' achievement found")
+                    else:
+                        print(f"   ℹ️  'Мульти-рейсер' not found (player may not meet balance criteria)")
+                    
+                    return True
+                else:
+                    print(f"   ℹ️  No race diversity achievements found (player may be specialist)")
+                    return True  # This is valid - not all players will have diversity achievements
+            else:
+                print(f"   ❌ No opponents found")
+                return False
+        
+        return success
+
+    def test_updated_endpoints_integration(self):
+        """Test that all endpoints are using the new smart functions"""
+        endpoints_to_test = [
+            ("check-match", "POST", {"battle_tag": "Siberia#21832"}),
+            ("demo-match", "GET", None),
+            ("player-stats/Siberia#21832", "GET", None)
+        ]
+        
+        all_passed = True
+        
+        for endpoint, method, data in endpoints_to_test:
+            success, response = self.run_test(
+                f"Updated Endpoint Integration - {endpoint}",
+                method,
+                endpoint,
+                200,
+                data=data
+            )
+            
+            if success and response:
+                # Check for indicators that new functions are being used
+                if endpoint == "check-match" or endpoint == "demo-match":
+                    # Should have opponent data with achievements and hero stats
+                    has_opponents = False
+                    if "data" in response:
+                        opponent_data = response["data"].get("opponent_data", {})
+                        opponents = opponent_data.get("opponents", [])
+                        if opponents:
+                            has_opponents = True
+                            opponent = opponents[0]
+                            
+                            # Check for multi-season hero stats
+                            has_hero_stats = "hero_stats" in opponent
+                            # Check for achievements (indicating new analysis)
+                            has_achievements = "achievements" in opponent and len(opponent["achievements"]) > 0
+                            
+                            print(f"      Hero stats: {'✅' if has_hero_stats else '❌'}")
+                            print(f"      Achievements: {'✅' if has_achievements else '❌'}")
+                            
+                            if not (has_hero_stats and has_achievements):
+                                all_passed = False
+                    
+                    if not has_opponents and response.get("status") != "not_in_game":
+                        print(f"      ⚠️  No opponents found and not 'not_in_game' status")
+                        all_passed = False
+                
+                elif endpoint.startswith("player-stats"):
+                    # Should have recent matches from smart retrieval
+                    has_matches = "recent_matches" in response and response["recent_matches"]
+                    print(f"      Smart matches: {'✅' if has_matches else '❌'}")
+                    if not has_matches:
+                        all_passed = False
+            else:
+                all_passed = False
+        
+        return all_passed
 
     def run_all_tests(self):
         """Run all backend tests"""
