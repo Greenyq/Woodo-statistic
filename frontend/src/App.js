@@ -330,6 +330,164 @@ function App() {
             ))}
           </div>
         </div>
+        
+        {/* Detailed Information Section */}
+        <div className="mt-3 pt-3 border-t border-slate-600/30">
+          {/* Threat Level Warning */}
+          {overallWinrate !== null && overallWinrate >= 55 && (
+            <div className={`mb-3 p-2 rounded-lg border-2 ${
+              overallWinrate >= 70 ? 'bg-red-600/10 border-red-600/50 text-red-300' :
+              overallWinrate >= 65 ? 'bg-orange-600/10 border-orange-600/50 text-orange-300' :
+              'bg-yellow-600/10 border-yellow-600/50 text-yellow-300'
+            }`}>
+              <div className="flex items-center gap-2 text-sm font-semibold">
+                {overallWinrate >= 70 && <span>🚨 КРИТИЧЕСКАЯ УГРОЗА!</span>}
+                {overallWinrate >= 65 && overallWinrate < 70 && <span>⚠️ ВЫСОКАЯ УГРОЗА!</span>}
+                {overallWinrate >= 55 && overallWinrate < 65 && <span>🔶 ОПАСНЫЙ ПРОТИВНИК!</span>}
+                <span>{overallWinrate}% винрейт - будьте осторожны!</span>
+              </div>
+            </div>
+          )}
+          
+          {/* Hero Statistics */}
+          {opponent.hero_stats?.heroStatsItemList && (
+            <div className="mb-3">
+              <div className="text-xs text-slate-400 mb-2 font-semibold">🎯 Статистика героев:</div>
+              <div className="grid gap-1 max-h-32 overflow-y-auto">
+                {opponent.hero_stats.heroStatsItemList
+                  .filter(heroStat => {
+                    const opponentRaceHeroes = getHeroesByRace(opponent.race);
+                    return opponent.race === "Random" || opponentRaceHeroes.includes(heroStat.heroId);
+                  })
+                  .slice(0, 4) // Show top 4 heroes
+                  .map((heroStat, idx) => {
+                    const heroOverallStats = heroStat.stats.find(stat => 
+                      stat.winLossesOnMap.some(mapStat => mapStat.map === "Overall")
+                    );
+                    
+                    if (!heroOverallStats) return null;
+                    
+                    const overallMap = heroOverallStats.winLossesOnMap.find(map => map.map === "Overall");
+                    if (!overallMap || !overallMap.winLosses) return null;
+                    
+                    let totalWins = 0, totalLosses = 0, totalGames = 0;
+                    overallMap.winLosses.forEach(wl => {
+                      totalWins += wl.wins || 0;
+                      totalLosses += wl.losses || 0;
+                      totalGames += wl.games || 0;
+                    });
+                    
+                    if (totalGames === 0) return null;
+                    const heroWinrate = Math.round((totalWins / totalGames) * 100);
+                    
+                    return (
+                      <div key={idx} className="flex items-center justify-between bg-slate-700/30 p-2 rounded text-xs">
+                        <div className="flex items-center gap-2">
+                          <span>{getHeroIcon(heroStat.heroId)}</span>
+                          <span className="text-slate-300 capitalize">
+                            {heroStat.heroId}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className={`font-semibold ${
+                            heroWinrate >= 70 ? 'text-red-400' :
+                            heroWinrate >= 60 ? 'text-orange-400' :
+                            heroWinrate >= 50 ? 'text-yellow-400' : 'text-green-400'
+                          }`}>
+                            {heroWinrate}%
+                          </span>
+                          <span className="text-slate-500">({totalGames})</span>
+                        </div>
+                      </div>
+                    );
+                  })}
+              </div>
+            </div>
+          )}
+          
+          {/* Map Statistics */}
+          {opponent.hero_stats?.heroStatsItemList && (
+            <div className="mb-3">
+              <div className="text-xs text-slate-400 mb-2 font-semibold">🗺️ Статистика по картам:</div>
+              <div className="grid gap-1 max-h-32 overflow-y-auto">
+                {(() => {
+                  // Collect map statistics from all heroes
+                  const mapStats = {};
+                  
+                  opponent.hero_stats.heroStatsItemList.forEach(heroStat => {
+                    heroStat.stats?.forEach(stat => {
+                      stat.winLossesOnMap?.forEach(mapStat => {
+                        if (mapStat.map !== "Overall" && mapStat.winLosses) {
+                          if (!mapStats[mapStat.map]) {
+                            mapStats[mapStat.map] = { wins: 0, losses: 0, games: 0 };
+                          }
+                          
+                          mapStat.winLosses.forEach(wl => {
+                            mapStats[mapStat.map].wins += wl.wins || 0;
+                            mapStats[mapStat.map].losses += wl.losses || 0;
+                            mapStats[mapStat.map].games += wl.games || 0;
+                          });
+                        }
+                      });
+                    });
+                  });
+                  
+                  return Object.entries(mapStats)
+                    .filter(([_, stats]) => stats.games >= 3) // Only maps with 3+ games
+                    .sort((a, b) => b[1].games - a[1].games) // Sort by games played
+                    .slice(0, 5) // Top 5 maps
+                    .map(([mapName, stats]) => {
+                      const mapWinrate = Math.round((stats.wins / stats.games) * 100);
+                      const cleanMapName = mapName.replace(/^\d+/, '').replace(/v\d+_\d+$/, '');
+                      
+                      return (
+                        <div key={mapName} className="flex items-center justify-between bg-slate-700/30 p-2 rounded text-xs">
+                          <span className="text-slate-300 truncate">{cleanMapName}</span>
+                          <div className="flex items-center gap-2">
+                            <span className={`font-semibold ${
+                              mapWinrate >= 70 ? 'text-red-400' :
+                              mapWinrate >= 60 ? 'text-orange-400' :
+                              mapWinrate >= 50 ? 'text-yellow-400' : 'text-green-400'
+                            }`}>
+                              {mapWinrate}%
+                            </span>
+                            <span className="text-slate-500">({stats.games})</span>
+                          </div>
+                        </div>
+                      );
+                    });
+                })()}
+              </div>
+            </div>
+          )}
+          
+          {/* Recent Performance */}
+          {opponent.recent_matches?.matches && (
+            <div>
+              <div className="text-xs text-slate-400 mb-2 font-semibold">⚡ Последние игры:</div>
+              <div className="flex gap-1 flex-wrap">
+                {opponent.recent_matches.matches.slice(0, 8).map((match, idx) => {
+                  const matchResult = determine_match_result(match, opponent.battle_tag);
+                  const won = matchResult?.won;
+                  
+                  return (
+                    <Badge 
+                      key={idx}
+                      className={`text-xs ${
+                        won ? 'bg-green-600/20 text-green-300' : 
+                        won === false ? 'bg-red-600/20 text-red-300' : 
+                        'bg-slate-600/20 text-slate-300'
+                      }`}
+                      title={`${match.map} - ${Math.round(match.durationInSeconds / 60)}m`}
+                    >
+                      {won ? 'W' : won === false ? 'L' : '?'}
+                    </Badge>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     );
   };
