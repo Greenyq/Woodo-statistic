@@ -479,10 +479,20 @@ function App() {
             {matchStatus && matchStatus.status === "in_game" && matchStatus.data && matchStatus.data.opponent_data && matchStatus.data.opponent_data.opponents && matchStatus.data.opponent_data.opponents.length > 0 && (
               <div className="space-y-6">
                 <div className="text-center">
-                  <h2 className="text-2xl font-bold text-amber-400 mb-2">🎯 Анализ Противника</h2>
-                  <Separator className="bg-amber-600/30" />
+                  <h2 className="text-2xl font-bold text-amber-400 mb-4">🎯 Анализ Противника</h2>
+                  
+                  {/* Table Headers */}
+                  <div className="bg-slate-700/30 border border-slate-600/30 rounded-lg p-3 mb-4">
+                    <div className="grid grid-cols-3 gap-4 text-sm font-medium text-slate-300">
+                      <div className="text-left">👤 Игрок & Герой</div>
+                      <div className="text-center">📊 Винрейт</div>
+                      <div className="text-right">🏆 Достижения</div>
+                    </div>
+                  </div>
+                  
+                  <Separator className="bg-amber-600/30 mb-4" />
                 </div>
-                <div className="grid gap-6">
+                <div className="space-y-2">
                   {matchStatus.data.opponent_data.opponents.map((opponent, index) => (
                     <OpponentCard key={index} opponent={opponent} />
                   ))}
