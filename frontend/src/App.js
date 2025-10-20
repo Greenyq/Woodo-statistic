@@ -308,22 +308,25 @@ function App() {
           </div>
           
           {/* Column 3: Achievements */}
-          <div className="flex flex-wrap gap-1 justify-end">
+          <div className="flex flex-col gap-1 justify-end">
             {opponent.achievements?.slice(0, 3).map((achievement, idx) => (
-              <Badge 
-                key={idx}
-                className={`text-xs ${
-                  achievement.color === 'blue' ? 'bg-blue-600/20 text-blue-300' :
-                  achievement.color === 'red' ? 'bg-red-600/20 text-red-300' :
-                  achievement.color === 'purple' ? 'bg-purple-600/20 text-purple-300' :
-                  achievement.color === 'green' ? 'bg-green-600/20 text-green-300' :
-                  achievement.color === 'yellow' ? 'bg-yellow-600/20 text-yellow-300' :
-                  'bg-slate-600/20 text-slate-300'
-                }`}
-                title={achievement.description}
-              >
-                {achievement.title.split(' ')[0]} {/* Show only first part/emoji */}
-              </Badge>
+              <div key={idx} className="flex flex-col items-end">
+                <Badge 
+                  className={`text-xs ${
+                    achievement.color === 'blue' ? 'bg-blue-600/20 text-blue-300' :
+                    achievement.color === 'red' ? 'bg-red-600/20 text-red-300' :
+                    achievement.color === 'purple' ? 'bg-purple-600/20 text-purple-300' :
+                    achievement.color === 'green' ? 'bg-green-600/20 text-green-300' :
+                    achievement.color === 'yellow' ? 'bg-yellow-600/20 text-yellow-300' :
+                    'bg-slate-600/20 text-slate-300'
+                  }`}
+                >
+                  {achievement.title.split(' ')[0]} {/* Show emoji */}
+                </Badge>
+                <span className="text-xs text-slate-400 text-right mt-1">
+                  {achievement.title.split(' ').slice(1).join(' ')} {/* Show title without emoji */}
+                </span>
+              </div>
             ))}
           </div>
         </div>
