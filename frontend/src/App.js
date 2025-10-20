@@ -467,8 +467,21 @@ function App() {
               <div className="text-xs text-slate-400 mb-2 font-semibold">⚡ Последние игры:</div>
               <div className="flex gap-1 flex-wrap">
                 {opponent.recent_matches.matches.slice(0, 8).map((match, idx) => {
-                  const matchResult = determine_match_result(match, opponent.battle_tag);
-                  const won = matchResult?.won;
+                  // Simple match result determination for frontend
+                  let won = null;
+                  if (match.teams) {
+                    for (const team of match.teams) {
+                      for (const player of team.players || []) {
+                        if (player.battleTag === opponent.battle_tag) {
+                          won = team.won || false;
+                          break;
+                        }
+                      }
+                      if (won !== null) break;
+                    }
+                  } else {
+                    won = match.won; // fallback to match.won if available
+                  }
                   
                   return (
                     <Badge 
