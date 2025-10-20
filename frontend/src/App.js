@@ -225,371 +225,109 @@ function App() {
   };
 
   const OpponentCard = ({ opponent }) => {
-    // Calculate opponent's TOTAL winrate from hero stats (filtered by opponent's race)
-    const getOpponentWinrateVsMyRace = () => {
+    // Find most played hero
+    const getMostPlayedHero = () => {
       if (!opponent.hero_stats?.heroStatsItemList) return null;
       
-      let totalWins = 0;
-      let totalLosses = 0;
+      let maxGames = 0;
+      let mostPlayedHero = null;
       
-      // Get heroes of opponent's race
-      const opponentRaceHeroes = getHeroesByRace(opponent.race);
-      
-      // Sum up hero stats, but only for opponent's race heroes
-      opponent.hero_stats.heroStatsItemList
-        .filter(heroStat => {
-          // Filter: only include heroes of opponent's race (or all if Random)
-          return opponent.race === "Random" || opponentRaceHeroes.includes(heroStat.heroId);
-        })
-        .forEach(heroStat => {
-          heroStat.stats?.forEach(stat => {
-            const overall = stat.winLossesOnMap?.find(wl => wl.map === "Overall");
-            if (overall) {
-              overall.winLosses?.forEach(wl => {
-                if (wl.games > 0) {
-                  totalWins += wl.wins;
-                  totalLosses += wl.losses;
-                }
-              });
-            }
-          });
+      opponent.hero_stats.heroStatsItemList.forEach(heroStat => {
+        let totalGames = 0;
+        heroStat.stats?.forEach(stat => {
+          const overall = stat.winLossesOnMap?.find(wl => wl.map === "Overall");
+          if (overall) {
+            overall.winLosses?.forEach(wl => {
+              totalGames += wl.games || 0;
+            });
+          }
         });
+        
+        if (totalGames > maxGames) {
+          maxGames = totalGames;
+          mostPlayedHero = {
+            heroId: heroStat.heroId,
+            games: totalGames
+          };
+        }
+      });
       
-      const totalGames = totalWins + totalLosses;
-      if (totalGames === 0) return null;
-      
-      const winrate = Math.round((totalWins / totalGames) * 100);
-      
-      return {
-        winrate,
-        wins: totalWins,
-        losses: totalLosses,
-        games: totalGames
-      };
+      return mostPlayedHero;
     };
 
-    const overallStats = getOpponentWinrateVsMyRace();
+    // Calculate overall winrate
+    const getOverallWinrate = () => {
+      if (!opponent.basic_stats?.winLosses) return null;
+      
+      let totalWins = 0;
+      let totalGames = 0;
+      
+      opponent.basic_stats.winLosses.forEach(wl => {
+        totalWins += wl.wins || 0;
+        totalGames += wl.games || 0;
+      });
+      
+      return totalGames > 0 ? Math.round((totalWins / totalGames) * 100) : 0;
+    };
+
+    const mostPlayedHero = getMostPlayedHero();
+    const overallWinrate = getOverallWinrate();
     
     return (
-      <Card className="bg-slate-800/50 border-amber-600/30" data-testid={`opponent-card-${opponent.battle_tag}`}>
-        <CardHeader className="pb-3">
-          <CardTitle className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-amber-400">
-              <User className="w-5 h-5" />
-              {opponent.battle_tag}
-              <Badge variant="secondary" className="bg-amber-600/20 text-amber-300">
-                {getRaceIcon(opponent.race)} {opponent.race}
-              </Badge>
+      <div className="bg-slate-800/50 border border-amber-600/30 rounded-lg p-4 mb-4">
+        <div className="grid grid-cols-3 gap-4 items-center">
+          {/* Column 1: Hero */}
+          <div className="flex items-center gap-3">
+            <div className="text-amber-400 font-semibold">
+              {getRaceIcon(opponent.race)} {opponent.battle_tag}
             </div>
-            
-            {/* MAIN FEATURE: Winrate vs My Race */}
-            {overallStats && (
-              <div className="text-right">
-                <div className={`text-2xl font-bold ${
-                  overallStats.winrate >= 65 ? 'text-red-400' : 
-                  overallStats.winrate >= 50 ? 'text-yellow-400' : 'text-green-400'
-                }`}>
-                  {overallStats.winrate}%
-                </div>
-                <div className="text-xs text-slate-400">
-                  vs {playerData.race}
-                </div>
-                <div className="text-xs text-slate-300">
-                  {overallStats.wins}W-{overallStats.losses}L
-                </div>
+            {mostPlayedHero && (
+              <div className="flex items-center gap-2 text-sm">
+                <span className="text-lg">{getHeroIcon(mostPlayedHero.heroId)}</span>
+                <span className="text-slate-300 capitalize">
+                  {mostPlayedHero.heroId}
+                </span>
+                <span className="text-xs text-slate-500">
+                  ({mostPlayedHero.games} игр)
+                </span>
               </div>
             )}
-          </CardTitle>
+          </div>
           
-          {/* Highlight section for winrate vs my race */}
-          {overallStats && (
-            <div className={`mt-3 p-3 rounded-lg border-2 ${
-              overallStats.winrate >= 65 ? 'bg-red-600/10 border-red-600/30' : 
-              overallStats.winrate >= 50 ? 'bg-yellow-600/10 border-yellow-600/30' : 'bg-green-600/10 border-green-600/30'
-            }`}>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span className="text-lg">🎯</span>
-                  <span className="font-semibold text-white">
-                    {opponent.race} ПРОТИВ {playerData.race}
-                  </span>
-                </div>
-                <div className="text-right">
-                  <div className={`text-xl font-bold ${
-                    overallStats.winrate >= 65 ? 'text-red-300' : 
-                    overallStats.winrate >= 50 ? 'text-yellow-300' : 'text-green-300'
-                  }`}>
-                    {overallStats.winrate}% винрейт
-                  </div>
-                  <div className="text-sm text-slate-300">
-                    {overallStats.games} матчей всего, {overallStats.wins}W-{overallStats.losses}L
-                  </div>
-                </div>
+          {/* Column 2: Winrate */}
+          <div className="text-center">
+            {overallWinrate !== null && (
+              <div className={`text-2xl font-bold ${
+                overallWinrate >= 65 ? 'text-red-400' : 
+                overallWinrate >= 50 ? 'text-yellow-400' : 'text-green-400'
+              }`}>
+                {overallWinrate}%
               </div>
-              
-              <div className="mt-2 text-sm">
-                {overallStats.winrate >= 65 && (
-                  <span className="text-red-300 font-semibold">🚨 КРИТИЧЕСКАЯ УГРОЗА! {overallStats.winrate}% винрейт - будьте осторожны!</span>
-                )}
-                {overallStats.winrate >= 50 && overallStats.winrate < 65 && (
-                  <span className="text-yellow-300 font-semibold">⚠️ СРЕДНЯЯ УГРОЗА! {overallStats.winrate}% винрейт - стабильный противник</span>
-                )}
-                {overallStats.winrate < 50 && (
-                  <span className="text-green-300 font-semibold">✅ УЯЗВИМОСТЬ! Всего {overallStats.winrate}% винрейт - используйте это!</span>
-                )}
-              </div>
-            </div>
-          )}
+            )}
+            <div className="text-xs text-slate-400">винрейт</div>
+          </div>
           
-          {!overallStats && (
-            <div className="mt-3 p-3 rounded-lg bg-slate-700/30 border border-slate-600/30">
-              <span className="text-slate-400 text-sm">
-                📊 Нет данных против {playerData.race}
-              </span>
-            </div>
-          )}
-          
-          {/* ACHIEVEMENTS SECTION */}
-          {opponent.achievements && opponent.achievements.length > 0 && (
-            <div className="mt-4 p-3 rounded-lg bg-gradient-to-r from-amber-600/10 to-orange-600/10 border border-amber-600/30">
-              <div className="flex items-center gap-2 mb-3">
-                <span className="text-lg">🏆</span>
-                <span className="font-semibold text-amber-300">Достижения игрока</span>
-              </div>
-              <div className="grid gap-2">
-                {opponent.achievements.map((achievement, idx) => (
-                  <div 
-                    key={idx} 
-                    className={`flex items-center justify-between p-2 rounded-md border-l-4 ${
-                      achievement.color === 'blue' ? 'bg-blue-600/10 border-blue-500' :
-                      achievement.color === 'red' ? 'bg-red-600/10 border-red-500' :
-                      achievement.color === 'purple' ? 'bg-purple-600/10 border-purple-500' :
-                      achievement.color === 'green' ? 'bg-green-600/10 border-green-500' :
-                      achievement.color === 'yellow' ? 'bg-yellow-600/10 border-yellow-500' :
-                      'bg-slate-600/10 border-slate-500'
-                    }`}
-                  >
-                    <div>
-                      <div className="font-medium text-white text-sm">
-                        {achievement.title}
-                      </div>
-                      <div className="text-xs text-slate-300">
-                        {achievement.description}
-                      </div>
-                    </div>
-                    <Badge 
-                      className={`text-xs ${
-                        achievement.color === 'blue' ? 'bg-blue-600/20 text-blue-300' :
-                        achievement.color === 'red' ? 'bg-red-600/20 text-red-300' :
-                        achievement.color === 'purple' ? 'bg-purple-600/20 text-purple-300' :
-                        achievement.color === 'green' ? 'bg-green-600/20 text-green-300' :
-                        achievement.color === 'yellow' ? 'bg-yellow-600/20 text-yellow-300' :
-                        'bg-slate-600/20 text-slate-300'
-                      }`}
-                    >
-                      {achievement.type}
-                    </Badge>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </CardHeader>
-        <CardContent className="space-y-6">
-          {/* LAST MATCH ANALYSIS */}
-          {opponent.recent_matches?.matches?.[0] && (
-            <div className="p-3 rounded-lg bg-gradient-to-r from-blue-600/10 to-cyan-600/10 border border-blue-600/30">
-              <div className="flex items-center gap-2 mb-3">
-                <span className="text-lg">🎯</span>
-                <span className="font-semibold text-blue-300">Последняя игра</span>
-              </div>
-              {(() => {
-                const lastMatch = opponent.recent_matches.matches[0];
-                const duration = lastMatch.durationInSeconds || 0;
-                const minutes = Math.round(duration / 60);
-                const won = lastMatch.won;
-                
-                // Analyze economy based on duration and result
-                let economyStatus = "";
-                if (duration < 600 && won) {
-                  economyStatus = "💰 Отличная экономика (быстрая победа)";
-                } else if (duration > 1800 && !won) {
-                  economyStatus = "💸 Слабая экономика (долгое поражение)";
-                } else if (duration > 1200 && won) {
-                  economyStatus = "🏦 Накопил ресурсы (долгая победа)";
-                } else if (duration < 480 && !won) {
-                  economyStatus = "💔 Нет экономики (быстрое поражение)";
-                } else {
-                  economyStatus = "⚖️ Стандартная экономика";
-                }
-                
-                return (
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <span className="text-amber-300 font-medium">{lastMatch.map}</span>
-                        <Badge className={won ? "bg-green-600/20 text-green-300" : "bg-red-600/20 text-red-300"}>
-                          {won ? "Победа" : "Поражение"}
-                        </Badge>
-                      </div>
-                      <span className="text-slate-300 text-sm">{minutes} мин</span>
-                    </div>
-                    <div className="text-sm">
-                      <span className="text-slate-400">Герой: </span>
-                      <span className="text-white">{getHeroIcon(lastMatch.heroUsed?.toLowerCase())} {lastMatch.heroUsed}</span>
-                    </div>
-                    <div className={`text-sm font-medium ${
-                      economyStatus.includes('💰') ? 'text-green-300' :
-                      economyStatus.includes('💸') || economyStatus.includes('💔') ? 'text-red-300' :
-                      economyStatus.includes('🏦') ? 'text-blue-300' : 'text-yellow-300'
-                    }`}>
-                      {economyStatus}
-                    </div>
-                  </div>
-                );
-              })()}
-            </div>
-          )}
-          
-          {/* Hero Statistics vs Your Race */}
-          {opponent.hero_stats?.heroStatsItemList && (
-            <div className="space-y-3">
-              <div className="flex items-center gap-2 text-purple-400">
-                <Shield className="w-4 h-4" />
-                <span className="text-sm font-semibold">{opponent.race} Heroes vs {playerData.race}</span>
-              </div>
-              <div className="grid gap-2 max-h-64 overflow-y-auto">
-                {opponent.hero_stats.heroStatsItemList
-                  // FILTER: Only show heroes of opponent's race
-                  .filter(heroStat => {
-                    const opponentRaceHeroes = getHeroesByRace(opponent.race);
-                    return opponent.race === "Random" || opponentRaceHeroes.includes(heroStat.heroId);
-                  })
-                  .map((heroStat, idx) => {
-                    // Find overall stats for this hero
-                    const heroOverallStats = heroStat.stats.find(stat => 
-                      stat.winLossesOnMap.some(mapStat => mapStat.map === "Overall")
-                    );
-                    
-                    if (!heroOverallStats) return null;
-                    
-                    const overallMap = heroOverallStats.winLossesOnMap.find(map => map.map === "Overall");
-                    if (!overallMap || !overallMap.winLosses) return null;
-                    
-                    // Sum all races for overall hero stats
-                    let totalWins = 0, totalLosses = 0, totalGames = 0;
-                    overallMap.winLosses.forEach(wl => {
-                      totalWins += wl.wins || 0;
-                      totalLosses += wl.losses || 0;
-                      totalGames += wl.games || 0;
-                    });
-                    
-                    if (totalGames === 0) return null;
-                    
-                    return (
-                      <div key={idx} className="bg-slate-700/50 p-3 rounded-lg border-l-4 border-amber-600/50">
-                        <div className="flex items-center justify-between mb-2">
-                          <div className="flex items-center gap-2">
-                            <span className="text-lg">{getHeroIcon(heroStat.heroId)}</span>
-                            <span className="text-amber-300 font-medium capitalize">
-                              {heroStat.heroId.replace(/([A-Z])/g, ' $1').trim()}
-                            </span>
-                            <Badge variant="secondary" className="bg-blue-600/20 text-blue-300 text-xs">
-                              {opponent.race}
-                            </Badge>
-                          </div>
-                          <div className="text-right">
-                            <div className={`font-semibold ${totalWins / totalGames > 0.6 ? 'text-red-400' : 
-                              totalWins / totalGames > 0.4 ? 'text-yellow-400' : 'text-green-400'}`}>
-                              {Math.round((totalWins / totalGames) * 100)}%
-                            </div>
-                            <div className="text-xs text-slate-400">
-                              {totalWins}W-{totalLosses}L
-                            </div>
-                          </div>
-                        </div>
-                        
-                        {/* Map specific stats */}
-                        <div className="space-y-1">
-                          {heroOverallStats.winLossesOnMap.filter(mapStat => 
-                            mapStat.map !== "Overall" && mapStat.winLosses && mapStat.winLosses.length > 0
-                          ).slice(0, 3).map((mapStat, mapIdx) => {
-                            // Calculate total for all races on this map
-                            let mapWins = 0, mapLosses = 0, mapGames = 0;
-                            mapStat.winLosses.forEach(wl => {
-                              mapWins += wl.wins || 0;
-                              mapLosses += wl.losses || 0;
-                              mapGames += wl.games || 0;
-                            });
-                            
-                            if (mapGames === 0) return null;
-                            const mapWinrate = mapWins / mapGames;
-                            
-                            return (
-                              <div key={mapIdx} className="text-xs flex justify-between text-slate-300">
-                                <span className="truncate max-w-32">{mapStat.map.replace(/^\d+/, '').replace(/v\d+_\d+$/, '')}</span>
-                                <span className={mapWinrate > 0.6 ? 'text-red-300' : 
-                                  mapWinrate > 0.4 ? 'text-yellow-300' : 'text-green-300'}>
-                                  {Math.round(mapWinrate * 100)}% ({mapGames})
-                                </span>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    );
-                  })}
-              </div>
-            </div>
-          )}
-
-          {/* Overall Statistics */}
-          {(opponent.basic_stats || opponent.race_stats) && (
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <div className="flex items-center gap-2 text-green-400">
-                  <Trophy className="w-4 h-4" />
-                  <span className="text-sm">Race Statistics</span>
-                </div>
-                {opponent.basic_stats?.winLosses?.map((stat, idx) => (
-                  <div key={idx} className="text-sm bg-slate-700/50 p-2 rounded">
-                    <div className="flex justify-between">
-                      <span>{getRaceIcon(get_race_name_from_number(stat.race))} {get_race_name_from_number(stat.race)}</span>
-                      <span className="text-amber-300">{Math.round(stat.winrate * 100)}%</span>
-                    </div>
-                    <div className="text-xs text-slate-400">
-                      {stat.wins}W - {stat.losses}L ({stat.games} games)
-                    </div>
-                  </div>
-                )) || <div className="text-sm text-slate-400">No race statistics available</div>}
-              </div>
-              <div className="space-y-2">
-                <div className="flex items-center gap-2 text-blue-400">
-                  <Target className="w-4 h-4" />
-                  <span className="text-sm">Recent Matches</span>
-                </div>
-                {opponent.recent_matches?.matches?.slice(0, 5).map((match, idx) => (
-                  <div key={idx} className="text-xs bg-slate-700/50 p-2 rounded">
-                    <div className="flex justify-between items-center">
-                      <span className="text-amber-300 truncate">{match.map?.replace(/^\d+/, '') || "Unknown"}</span>
-                      <Badge 
-                        variant={match.won ? "success" : "destructive"}
-                        className={match.won ? "bg-green-600/20 text-green-300" : "bg-red-600/20 text-red-300"}
-                      >
-                        {match.won ? "W" : "L"}
-                      </Badge>
-                    </div>
-                    <div className="text-slate-400 mt-1">
-                      {Math.round(match.durationInSeconds / 60)}m
-                      {match.heroUsed && <span className="ml-2">{getHeroIcon(match.heroUsed.toLowerCase())}</span>}
-                    </div>
-                  </div>
-                )) || <div className="text-sm text-slate-400">No recent matches found</div>}
-              </div>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+          {/* Column 3: Achievements */}
+          <div className="flex flex-wrap gap-1 justify-end">
+            {opponent.achievements?.slice(0, 3).map((achievement, idx) => (
+              <Badge 
+                key={idx}
+                className={`text-xs ${
+                  achievement.color === 'blue' ? 'bg-blue-600/20 text-blue-300' :
+                  achievement.color === 'red' ? 'bg-red-600/20 text-red-300' :
+                  achievement.color === 'purple' ? 'bg-purple-600/20 text-purple-300' :
+                  achievement.color === 'green' ? 'bg-green-600/20 text-green-300' :
+                  achievement.color === 'yellow' ? 'bg-yellow-600/20 text-yellow-300' :
+                  'bg-slate-600/20 text-slate-300'
+                }`}
+                title={achievement.description}
+              >
+                {achievement.title.split(' ')[0]} {/* Show only first part/emoji */}
+              </Badge>
+            ))}
+          </div>
+        </div>
+      </div>
     );
   };
 
