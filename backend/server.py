@@ -496,6 +496,227 @@ def calculate_build_order_consistency(analyses: List[ReplayAnalysis]) -> float:
     
     return consistency
 
+def get_hero_to_units_mapping():
+    """Map heroes to their typical unit compositions"""
+    return {
+        # Human heroes
+        "archmage": {
+            "primary_units": ["footman", "rifleman", "sorceress", "priest"],
+            "secondary_units": ["knight", "spell_breaker"],
+            "strategy_focus": "caster_heavy"
+        },
+        "mountainking": {
+            "primary_units": ["footman", "rifleman", "knight"],
+            "secondary_units": ["mortar_team", "flying_machine"],
+            "strategy_focus": "melee_heavy"
+        },
+        "paladin": {
+            "primary_units": ["footman", "knight", "priest"],
+            "secondary_units": ["rifleman", "spell_breaker"],
+            "strategy_focus": "heal_tank"
+        },
+        "bloodmage": {
+            "primary_units": ["footman", "spell_breaker", "phoenix"],
+            "secondary_units": ["knight", "sorceress"],
+            "strategy_focus": "anti_caster"
+        },
+        
+        # Orc heroes
+        "blademaster": {
+            "primary_units": ["grunt", "raider", "wind_rider"],
+            "secondary_units": ["troll_headhunter", "kodo_beast"],
+            "strategy_focus": "mobility_harass"
+        },
+        "farseer": {
+            "primary_units": ["grunt", "troll_headhunter", "spirit_walker"],
+            "secondary_units": ["raider", "wind_rider"],
+            "strategy_focus": "caster_support"
+        },
+        "taurenchieftain": {
+            "primary_units": ["grunt", "troll_headhunter", "tauren"],
+            "secondary_units": ["kodo_beast", "wind_rider"],
+            "strategy_focus": "heavy_melee"
+        },
+        "shadowhunter": {
+            "primary_units": ["troll_headhunter", "wind_rider", "troll_witch_doctor"],
+            "secondary_units": ["grunt", "spirit_walker"],
+            "strategy_focus": "ranged_caster"
+        },
+        
+        # Night Elf heroes
+        "demonhunter": {
+            "primary_units": ["archer", "huntress", "dryad"],
+            "secondary_units": ["druid_of_the_claw", "ballista"],
+            "strategy_focus": "ranged_kite"
+        },
+        "keeperofthegrove": {
+            "primary_units": ["archer", "druid_of_the_claw", "dryad"],
+            "secondary_units": ["huntress", "druid_of_the_talon"],
+            "strategy_focus": "nature_summon"
+        },
+        "priestessofthemoon": {
+            "primary_units": ["archer", "huntress", "druid_of_the_talon"],
+            "secondary_units": ["dryad", "ballista"],
+            "strategy_focus": "owl_scout"
+        },
+        "warden": {
+            "primary_units": ["huntress", "druid_of_the_claw", "chimera"],
+            "secondary_units": ["archer", "mountain_giant"],
+            "strategy_focus": "stealth_ambush"
+        },
+        
+        # Undead heroes
+        "deathknight": {
+            "primary_units": ["ghoul", "crypt_fiend", "necromancer"],
+            "secondary_units": ["abomination", "meat_wagon"],
+            "strategy_focus": "unholy_swarm"
+        },
+        "lich": {
+            "primary_units": ["skeleton", "necromancer", "banshee"],
+            "secondary_units": ["crypt_fiend", "frost_wyrm"],
+            "strategy_focus": "undead_mass"
+        },
+        "dreadlord": {
+            "primary_units": ["ghoul", "crypt_fiend", "destroyer"],
+            "secondary_units": ["gargoyle", "abomination"],
+            "strategy_focus": "air_superiority"
+        },
+        "cryptlord": {
+            "primary_units": ["crypt_fiend", "carrion_beetle", "necromancer"],
+            "secondary_units": ["ghoul", "destroyer"],
+            "strategy_focus": "bug_swarm"
+        }
+    }
+
+def analyze_unit_composition_vs_race(hero_stats: dict, opponent_race: str, target_race: str = None) -> dict:
+    """Analyze what units opponent typically uses based on hero picks"""
+    if not hero_stats or not hero_stats.get('heroStatsItemList'):
+        return None
+    
+    hero_unit_mapping = get_hero_to_units_mapping()
+    unit_predictions = {}
+    strategy_focus_counts = {}
+    
+    # Analyze each hero the opponent uses
+    for hero_stat in hero_stats['heroStatsItemList']:
+        hero_id = hero_stat.get('heroId', '').lower()
+        
+        # Get hero usage stats
+        total_games = 0
+        for stat in hero_stat.get('stats', []):
+            overall_map = None
+            for map_stat in stat.get('winLossesOnMap', []):
+                if map_stat.get('map') == 'Overall':
+                    overall_map = map_stat
+                    break
+            
+            if overall_map:
+                for wl in overall_map.get('winLosses', []):
+                    total_games += wl.get('games', 0)
+        
+        # Skip heroes with very few games
+        if total_games < 3:
+            continue
+        
+        # Map hero to units
+        if hero_id in hero_unit_mapping:
+            hero_data = hero_unit_mapping[hero_id]
+            
+            # Weight by games played
+            weight = min(total_games / 10, 1.0)  # Max weight at 10+ games
+            
+            # Add primary units
+            for unit in hero_data['primary_units']:
+                unit_predictions[unit] = unit_predictions.get(unit, 0) + (weight * 0.8)
+            
+            # Add secondary units  
+            for unit in hero_data['secondary_units']:
+                unit_predictions[unit] = unit_predictions.get(unit, 0) + (weight * 0.3)
+            
+            # Track strategy focus
+            focus = hero_data['strategy_focus']
+            strategy_focus_counts[focus] = strategy_focus_counts.get(focus, 0) + weight
+    
+    if not unit_predictions:
+        return None
+    
+    # Sort units by likelihood
+    sorted_units = sorted(unit_predictions.items(), key=lambda x: x[1], reverse=True)
+    
+    # Get most likely strategy focus
+    most_likely_focus = max(strategy_focus_counts.items(), key=lambda x: x[1])[0] if strategy_focus_counts else "balanced"
+    
+    return {
+        "predicted_units": sorted_units[:6],  # Top 6 most likely units
+        "strategy_focus": most_likely_focus,
+        "confidence": min(sum(unit_predictions.values()) / 3, 1.0),  # Confidence based on data amount
+        "counter_recommendations": get_counter_units(sorted_units[:3], opponent_race, target_race)
+    }
+
+def get_counter_units(enemy_units: list, enemy_race: str, your_race: str = None) -> list:
+    """Get recommended counter units based on enemy composition"""
+    counter_mapping = {
+        # Counters for common units
+        "footman": ["archer", "crypt_fiend", "troll_headhunter"],
+        "rifleman": ["huntress", "ghoul", "raider"],
+        "sorceress": ["spell_breaker", "destroyer", "banshee"],
+        "knight": ["crypt_fiend", "spear_thrower", "pike_man"],
+        
+        "grunt": ["archer", "rifleman", "huntress"],
+        "troll_headhunter": ["footman", "ghoul", "huntress"],
+        "raider": ["rifleman", "archer", "crypt_fiend"],
+        "wind_rider": ["rifleman", "archer", "gargoyle"],
+        
+        "archer": ["footman", "grunt", "ghoul"],
+        "huntress": ["rifleman", "troll_headhunter", "crypt_fiend"],
+        "druid_of_the_claw": ["crypt_fiend", "destroyer", "mortar_team"],
+        
+        "ghoul": ["rifleman", "archer", "huntress"],
+        "crypt_fiend": ["knight", "tauren", "mountain_giant"],
+        "necromancer": ["spell_breaker", "destroyer", "druid_of_the_talon"],
+        "abomination": ["archer", "crypt_fiend", "ballista"]
+    }
+    
+    counter_recommendations = []
+    for unit_name, _ in enemy_units:
+        if unit_name in counter_mapping:
+            counter_recommendations.extend(counter_mapping[unit_name])
+    
+    # Remove duplicates and return top counters
+    unique_counters = list(dict.fromkeys(counter_recommendations))
+    return unique_counters[:4]
+
+def format_unit_name(unit_name: str) -> str:
+    """Format unit names for display"""
+    unit_display_names = {
+        "footman": "👤 Пехотинец",
+        "rifleman": "🔫 Стрелок", 
+        "sorceress": "✨ Чародейка",
+        "knight": "🐎 Рыцарь",
+        "priest": "⛪ Жрец",
+        "spell_breaker": "🛡️ Разрушитель",
+        
+        "grunt": "⚔️ Пехотинец",
+        "troll_headhunter": "🏹 Охотник",
+        "raider": "🐺 Рейдер",
+        "wind_rider": "🦅 Летун",
+        "tauren": "🐂 Таурен",
+        
+        "archer": "🏹 Лучница",
+        "huntress": "🌙 Охотница",
+        "druid_of_the_claw": "🐻 Друид Когтя",
+        "dryad": "🧚 Дриада",
+        "mountain_giant": "⛰️ Гигант",
+        
+        "ghoul": "🧟 Упырь",
+        "crypt_fiend": "🕷️ Склепный",
+        "necromancer": "☠️ Некромант",
+        "abomination": "🤢 Мерзость",
+        "banshee": "👻 Банши"
+    }
+    
+    return unit_display_names.get(unit_name, f"⚔️ {unit_name.replace('_', ' ').title()}")
+
 def get_race_number(race_name: str) -> int:
     """Convert race name to W3C race number"""
     race_map = {
