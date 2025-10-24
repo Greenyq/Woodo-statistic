@@ -1113,7 +1113,8 @@ async def get_demo_match():
                             "race_stats": opponent_race_stats,
                             "recent_matches": opponent_matches,
                             "hero_stats": opponent_hero_stats,
-                            "achievements": opponent_achievements
+                            "achievements": opponent_achievements,
+                            "replay_analysis": replay_analysis.dict() if replay_analysis else None
                         }
                     ]
                 },
