@@ -387,14 +387,18 @@ async def analyze_player_replays(battle_tag: str, match_ids: List[str] = None) -
         
         avg_aggression = sum(a.aggression_level for a in analyses if a.aggression_level) / len([a for a in analyses if a.aggression_level])
         
+        # Calculate economy rating based on match patterns
+        economy_rating = calculate_economy_rating(analyses)
+        build_order_rating = calculate_build_order_consistency(analyses)
+        
         player_stats = PlayerReplayStats(
             battle_tag=battle_tag,
             total_replays_analyzed=len(analyses),
             avg_apm=avg_apm if avg_apm else None,
             favorite_strategy=favorite_strategy,
             aggression_rating=avg_aggression if avg_aggression else None,
-            economy_rating=0.7,  # Placeholder
-            build_order_consistency=0.8,  # Placeholder
+            economy_rating=economy_rating,
+            build_order_consistency=build_order_rating,
             recent_analyses=analyses
         )
         
