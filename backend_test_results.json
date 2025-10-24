@@ -1,196 +1,238 @@
 {
   "summary": {
-    "tests_run": 31,
-    "tests_passed": 31,
+    "tests_run": 38,
+    "tests_passed": 38,
     "success_rate": 100.0,
-    "timestamp": "2025-10-06T17:31:36.979181"
+    "timestamp": "2025-10-24T14:57:07.653196"
   },
   "test_results": [
     {
       "test_name": "API Root",
       "success": true,
       "details": "Status: 200, Response keys: ['message']",
-      "timestamp": "2025-10-06T17:31:13.968524"
+      "timestamp": "2025-10-24T14:56:37.521599"
     },
     {
       "test_name": "Check Match - Valid Input",
       "success": true,
       "details": "Status: 200, Response keys: ['status', 'message', 'data']",
-      "timestamp": "2025-10-06T17:31:14.562133"
+      "timestamp": "2025-10-24T14:56:38.052864"
     },
     {
       "test_name": "Player Stats",
       "success": true,
       "details": "Status: 200, Response keys: ['battle_tag', 'statistics', 'recent_matches']",
-      "timestamp": "2025-10-06T17:31:15.857252"
+      "timestamp": "2025-10-24T14:56:39.343693"
     },
     {
       "test_name": "Match History",
       "success": true,
       "details": "Status: 200, Response keys: ['match_history']",
-      "timestamp": "2025-10-06T17:31:16.258575"
+      "timestamp": "2025-10-24T14:56:39.634738"
     },
     {
       "test_name": "Demo Match Endpoint",
       "success": true,
       "details": "Status: 200, Response keys: ['status', 'message', 'data']",
-      "timestamp": "2025-10-06T17:31:18.706080"
+      "timestamp": "2025-10-24T14:56:42.033276"
     },
     {
       "test_name": "Achievement System - Real Player (Siberia#21832)",
       "success": true,
       "details": "Status: 200, Response keys: ['status', 'message', 'data']",
-      "timestamp": "2025-10-06T17:31:19.144649"
+      "timestamp": "2025-10-24T14:56:42.447894"
     },
     {
       "test_name": "Achievement Categories Analysis",
       "success": true,
       "details": "Status: 200, Response keys: ['status', 'message', 'data']",
-      "timestamp": "2025-10-06T17:31:21.569316"
+      "timestamp": "2025-10-24T14:56:44.834207"
     },
     {
       "test_name": "Battle Tag Encoding - Standard ASCII",
       "success": true,
       "details": "Status: 200, Response keys: ['status', 'message', 'data']",
-      "timestamp": "2025-10-06T17:31:21.998527"
+      "timestamp": "2025-10-24T14:56:45.255021"
     },
     {
       "test_name": "Battle Tag Encoding - Cyrillic characters",
       "success": true,
       "details": "Status: 200, Response keys: ['status', 'message', 'data']",
-      "timestamp": "2025-10-06T17:31:22.430938"
+      "timestamp": "2025-10-24T14:56:45.672700"
     },
     {
       "test_name": "Battle Tag Encoding - 5-digit tag",
       "success": true,
       "details": "Status: 200, Response keys: ['status', 'message', 'data']",
-      "timestamp": "2025-10-06T17:31:22.853511"
+      "timestamp": "2025-10-24T14:56:46.092005"
     },
     {
       "test_name": "Error Handling - Non-existent Player",
       "success": true,
       "details": "Status: 200, Response keys: ['status', 'message', 'data']",
-      "timestamp": "2025-10-06T17:31:23.276133"
+      "timestamp": "2025-10-24T14:56:46.509206"
     },
     {
       "test_name": "Multi-Season Hero Data Integration",
       "success": true,
       "details": "Status: 200, Response keys: ['status', 'message', 'data']",
-      "timestamp": "2025-10-06T17:31:25.727295"
+      "timestamp": "2025-10-24T14:56:48.908078"
     },
     {
       "test_name": "Smart Recent Matches - Multi-Season",
       "success": true,
       "details": "Status: 200, Response keys: ['battle_tag', 'statistics', 'recent_matches']",
-      "timestamp": "2025-10-06T17:31:27.310981"
+      "timestamp": "2025-10-24T14:56:50.199086"
     },
     {
       "test_name": "Multi-Race Achievement Balance Logic",
       "success": true,
       "details": "Status: 200, Response keys: ['status', 'message', 'data']",
-      "timestamp": "2025-10-06T17:31:29.719780"
+      "timestamp": "2025-10-24T14:56:52.572988"
     },
     {
       "test_name": "Updated Endpoint Integration - check-match",
       "success": true,
       "details": "Status: 200, Response keys: ['status', 'message', 'data']",
-      "timestamp": "2025-10-06T17:31:30.167888"
+      "timestamp": "2025-10-24T14:56:52.992686"
     },
     {
       "test_name": "Updated Endpoint Integration - demo-match",
       "success": true,
       "details": "Status: 200, Response keys: ['status', 'message', 'data']",
-      "timestamp": "2025-10-06T17:31:32.587357"
+      "timestamp": "2025-10-24T14:56:55.373319"
     },
     {
       "test_name": "Updated Endpoint Integration - player-stats/Siberia#21832",
       "success": true,
       "details": "Status: 200, Response keys: ['battle_tag', 'statistics', 'recent_matches']",
-      "timestamp": "2025-10-06T17:31:34.019922"
+      "timestamp": "2025-10-24T14:56:56.673853"
+    },
+    {
+      "test_name": "Replay Analysis Endpoint",
+      "success": true,
+      "details": "Status: 200, Response keys: ['battle_tag', 'analysis', 'message']",
+      "timestamp": "2025-10-24T14:56:57.472746"
+    },
+    {
+      "test_name": "Replay Analysis Functions",
+      "success": true,
+      "details": "Status: 200, Response keys: ['battle_tag', 'analysis', 'message']",
+      "timestamp": "2025-10-24T14:56:58.265795"
+    },
+    {
+      "test_name": "Replay Analysis Integration - Check Match",
+      "success": true,
+      "details": "Status: 200, Response keys: ['status', 'message', 'data']",
+      "timestamp": "2025-10-24T14:56:58.687663"
+    },
+    {
+      "test_name": "Replay Analysis Integration - Demo Match",
+      "success": true,
+      "details": "Status: 200, Response keys: ['status', 'message', 'data']",
+      "timestamp": "2025-10-24T14:57:01.074680"
+    },
+    {
+      "test_name": "Replay Analysis Data Quality",
+      "success": true,
+      "details": "Status: 200, Response keys: ['battle_tag', 'analysis', 'message']",
+      "timestamp": "2025-10-24T14:57:01.912820"
+    },
+    {
+      "test_name": "Performance Impact - Check Match",
+      "success": true,
+      "details": "Status: 200, Response keys: ['status', 'message', 'data']",
+      "timestamp": "2025-10-24T14:57:02.368244"
+    },
+    {
+      "test_name": "Performance Impact - Demo Match",
+      "success": true,
+      "details": "Status: 200, Response keys: ['status', 'message', 'data']",
+      "timestamp": "2025-10-24T14:57:04.738211"
     },
     {
       "test_name": "Check Match - Invalid Battle Tag",
       "success": true,
       "details": "Status: 422, Response keys: ['detail']",
-      "timestamp": "2025-10-06T17:31:34.056782"
+      "timestamp": "2025-10-24T14:57:04.775938"
     },
     {
       "test_name": "Check Match - No Race Required",
       "success": true,
       "details": "Status: 200, Response keys: ['status', 'message', 'data']",
-      "timestamp": "2025-10-06T17:31:34.482730"
+      "timestamp": "2025-10-24T14:57:05.188328"
     },
     {
       "test_name": "Check Match - Missing Battle Tag",
       "success": true,
       "details": "Status: 422, Response keys: ['detail']",
-      "timestamp": "2025-10-06T17:31:34.518770"
+      "timestamp": "2025-10-24T14:57:05.224370"
     },
     {
       "test_name": "Race No Longer Required",
       "success": true,
       "details": "Status: 200, Response keys: ['status', 'message', 'data']",
-      "timestamp": "2025-10-06T17:31:34.946278"
+      "timestamp": "2025-10-24T14:57:05.642736"
     },
     {
       "test_name": "Battle Tag Format - Valid 4-digit",
       "success": true,
       "details": "Status: 200, Response keys: ['status', 'message', 'data']",
-      "timestamp": "2025-10-06T17:31:35.395541"
+      "timestamp": "2025-10-24T14:57:06.097501"
     },
     {
       "test_name": "Battle Tag Format - Valid 5-digit",
       "success": true,
       "details": "Status: 200, Response keys: ['status', 'message', 'data']",
-      "timestamp": "2025-10-06T17:31:35.868989"
+      "timestamp": "2025-10-24T14:57:06.530527"
     },
     {
       "test_name": "Battle Tag Format - Valid with numbers",
       "success": true,
       "details": "Status: 200, Response keys: ['status', 'message', 'data']",
-      "timestamp": "2025-10-06T17:31:36.290401"
+      "timestamp": "2025-10-24T14:57:06.986263"
     },
     {
       "test_name": "Battle Tag Format - No # symbol",
       "success": true,
       "details": "Status: 422, Response keys: ['detail']",
-      "timestamp": "2025-10-06T17:31:36.324435"
+      "timestamp": "2025-10-24T14:57:07.023548"
     },
     {
       "test_name": "Battle Tag Format - 3 digits",
       "success": true,
       "details": "Status: 422, Response keys: ['detail']",
-      "timestamp": "2025-10-06T17:31:36.400220"
+      "timestamp": "2025-10-24T14:57:07.054971"
     },
     {
       "test_name": "Battle Tag Format - 6 digits",
       "success": true,
       "details": "Status: 422, Response keys: ['detail']",
-      "timestamp": "2025-10-06T17:31:36.436863"
+      "timestamp": "2025-10-24T14:57:07.089869"
     },
     {
       "test_name": "Battle Tag Format - Non-numeric after #",
       "success": true,
       "details": "Status: 422, Response keys: ['detail']",
-      "timestamp": "2025-10-06T17:31:36.475191"
+      "timestamp": "2025-10-24T14:57:07.125615"
     },
     {
       "test_name": "Battle Tag Format - Empty string",
       "success": true,
       "details": "Status: 422, Response keys: ['detail']",
-      "timestamp": "2025-10-06T17:31:36.515837"
+      "timestamp": "2025-10-24T14:57:07.199030"
     },
     {
       "test_name": "Battle Tag Format - No digits after #",
       "success": true,
       "details": "Status: 422, Response keys: ['detail']",
-      "timestamp": "2025-10-06T17:31:36.555764"
+      "timestamp": "2025-10-24T14:57:07.234963"
     },
     {
       "test_name": "W3Champions Integration",
       "success": true,
       "details": "Status: 200, Response keys: ['status', 'message', 'data']",
-      "timestamp": "2025-10-06T17:31:36.978036"
+      "timestamp": "2025-10-24T14:57:07.652208"
     }
   ]
 }
