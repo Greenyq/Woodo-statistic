@@ -430,6 +430,72 @@ def calculate_aggression_from_duration(duration: int) -> float:
     else:
         return 0.3
 
+def calculate_economy_rating(analyses: List[ReplayAnalysis]) -> float:
+    """Calculate economy rating based on multiple factors"""
+    if not analyses:
+        return 0.5
+    
+    total_score = 0
+    
+    for analysis in analyses:
+        score = 0.5  # Base score
+        
+        # APM factor (higher APM = better economy management)
+        if analysis.apm:
+            if analysis.apm >= 200:
+                score += 0.3  # Excellent APM
+            elif analysis.apm >= 120:
+                score += 0.2  # Good APM
+            elif analysis.apm >= 80:
+                score += 0.1  # Average APM
+            # Below 80 APM = no bonus
+        
+        # Game duration factor (optimal games show good economy)
+        duration = analysis.duration_seconds
+        if 600 <= duration <= 1200:  # 10-20 min = optimal economy games
+            score += 0.1
+        elif duration > 1800:  # Very long games = good late economy
+            score += 0.15
+        elif duration < 300:  # Very short = poor economy development
+            score -= 0.1
+            
+        # Strategy factor
+        if analysis.strategy_type == "macro":
+            score += 0.1  # Macro players typically have better economy
+        elif analysis.strategy_type == "rush":
+            score -= 0.05  # Rush players focus less on economy
+            
+        # Ensure score stays in valid range
+        score = max(0.0, min(1.0, score))
+        total_score += score
+    
+    return total_score / len(analyses)
+
+def calculate_build_order_consistency(analyses: List[ReplayAnalysis]) -> float:
+    """Calculate build order consistency based on strategy patterns"""
+    if not analyses:
+        return 0.5
+    
+    # Count strategy types
+    strategy_counts = {}
+    for analysis in analyses:
+        if analysis.strategy_type:
+            strategy_counts[analysis.strategy_type] = strategy_counts.get(analysis.strategy_type, 0) + 1
+    
+    if not strategy_counts:
+        return 0.5
+    
+    # More consistent if player sticks to fewer strategies
+    total_games = len(analyses)
+    most_common_count = max(strategy_counts.values())
+    consistency = most_common_count / total_games
+    
+    # Bonus for having a clear preference (>60% same strategy)
+    if consistency >= 0.6:
+        consistency = min(1.0, consistency + 0.1)
+    
+    return consistency
+
 def get_race_number(race_name: str) -> int:
     """Convert race name to W3C race number"""
     race_map = {
