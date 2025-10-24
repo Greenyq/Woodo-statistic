@@ -12,6 +12,9 @@ from typing import List, Optional, Dict, Any
 import uuid
 from datetime import datetime, timezone
 import re
+import tempfile
+import w3g
+from urllib.parse import urljoin
 
 
 ROOT_DIR = Path(__file__).parent
