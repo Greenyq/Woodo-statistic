@@ -276,7 +276,7 @@ def analyze_replay_file(replay_data: bytes, battle_tag: str) -> Optional[ReplayA
                         apm = apm_data[battle_tag]
                     elif isinstance(apm_data, (int, float)):
                         apm = float(apm_data)
-            except:
+            except Exception:
                 pass
             
             # Analyze build order and strategy
