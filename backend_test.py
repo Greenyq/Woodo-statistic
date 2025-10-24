@@ -1054,6 +1054,16 @@ class W3ChampionsAPITester:
         self.test_multi_race_achievement_logic()
         self.test_updated_endpoints_integration()
         
+        # REPLAY ANALYSIS SYSTEM TESTS (Current Review Focus)
+        print("\n🎮 REPLAY ANALYSIS SYSTEM TESTS")
+        print("=" * 40)
+        self.test_replay_analysis_endpoint()
+        self.test_replay_analysis_functions()
+        self.test_replay_analysis_integration_check_match()
+        self.test_replay_analysis_integration_demo_match()
+        self.test_replay_analysis_data_quality()
+        self.test_replay_analysis_performance_impact()
+        
         # Validation tests
         print("\n🔍 VALIDATION TESTS")
         print("=" * 40)
