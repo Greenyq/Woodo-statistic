@@ -1089,6 +1089,9 @@ async def get_demo_match():
             demo_battle_tag
         )
         
+        # Analyze replays for strategic insights
+        replay_analysis = await analyze_player_replays(demo_battle_tag)
+        
         demo_match_data = {
             "status": "in_game",
             "message": f"Demo match found! Player DemoPlayer#1234 vs {demo_battle_tag}",
