@@ -1295,6 +1295,13 @@ async def check_player_match(player_input: PlayerInput):
                         # Analyze replays for strategic insights
                         replay_analysis = await analyze_player_replays(opponent_tag)
                         
+                        # Analyze unit composition preferences
+                        # Note: We don't know player's race from battle_tag only, so we'll analyze general patterns
+                        unit_analysis = analyze_unit_composition_vs_race(
+                            opponent_hero_stats, 
+                            opponent_race
+                        )
+                        
                         opponents.append({
                             "battle_tag": opponent_tag,
                             "race": get_race_name(player.get("race", 16)),
@@ -1303,7 +1310,8 @@ async def check_player_match(player_input: PlayerInput):
                             "recent_matches": opponent_matches,
                             "hero_stats": opponent_hero_stats,
                             "achievements": opponent_achievements,
-                            "replay_analysis": replay_analysis.dict() if replay_analysis else None
+                            "replay_analysis": replay_analysis.dict() if replay_analysis else None,
+                            "unit_analysis": unit_analysis
                         })
         
         match_status = MatchStatus(
