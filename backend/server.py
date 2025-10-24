@@ -63,6 +63,45 @@ class OpponentStats(BaseModel):
     hero_stats: List[Dict[str, Any]] = []
     recent_matches: List[Dict[str, Any]] = []
 
+class ReplayAnalysis(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    match_id: str
+    player_battle_tag: str
+    duration_seconds: int
+    map_name: str
+    winner: Optional[str] = None
+    
+    # Economy metrics
+    apm: Optional[float] = None
+    avg_gold_income: Optional[float] = None
+    avg_wood_income: Optional[float] = None
+    max_workers: Optional[int] = None
+    
+    # Build order analysis
+    first_building_time: Optional[int] = None
+    expansion_time: Optional[int] = None
+    tech_buildings: List[Dict[str, int]] = []  # building_name -> time
+    
+    # Army composition
+    units_produced: Dict[str, int] = {}
+    units_lost: Dict[str, int] = {}
+    
+    # Strategic analysis
+    strategy_type: Optional[str] = None  # "rush", "macro", "turtle", "cheese"
+    aggression_level: Optional[float] = None  # 0.0 - 1.0
+    
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class PlayerReplayStats(BaseModel):
+    battle_tag: str
+    total_replays_analyzed: int
+    avg_apm: Optional[float] = None
+    favorite_strategy: Optional[str] = None
+    economy_rating: Optional[float] = None  # 0.0 - 1.0
+    aggression_rating: Optional[float] = None
+    build_order_consistency: Optional[float] = None
+    recent_analyses: List[ReplayAnalysis] = []
+
 # W3Champions API client
 async def get_w3c_data(endpoint: str) -> Optional[Dict]:
     """Fetch data from W3Champions API"""
