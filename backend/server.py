@@ -1002,6 +1002,9 @@ async def check_player_match(player_input: PlayerInput):
                             opponent_tag
                         )
                         
+                        # Analyze replays for strategic insights
+                        replay_analysis = await analyze_player_replays(opponent_tag)
+                        
                         opponents.append({
                             "battle_tag": opponent_tag,
                             "race": get_race_name(player.get("race", 16)),
@@ -1009,7 +1012,8 @@ async def check_player_match(player_input: PlayerInput):
                             "race_stats": opponent_race_stats,
                             "recent_matches": opponent_matches,
                             "hero_stats": opponent_hero_stats,
-                            "achievements": opponent_achievements
+                            "achievements": opponent_achievements,
+                            "replay_analysis": replay_analysis.dict() if replay_analysis else None
                         })
         
         match_status = MatchStatus(
