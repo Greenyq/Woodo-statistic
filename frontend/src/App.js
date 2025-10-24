@@ -587,8 +587,11 @@ function App() {
                 </div>
               </div>
               
-              <div className="mt-2 text-xs text-slate-500">
-                Проанализировано реплеев: {opponent.replay_analysis.total_replays_analyzed || 0}
+              <div className="mt-2 space-y-1 text-xs text-slate-500">
+                <div>Проанализировано реплеев: {opponent.replay_analysis.total_replays_analyzed || 0}</div>
+                <div className="italic">
+                  💡 Агрессия = скорость атак • Экономика = эффективность развития
+                </div>
               </div>
             </div>
           )}
