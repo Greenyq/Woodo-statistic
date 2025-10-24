@@ -543,7 +543,12 @@ function App() {
                 <div className="space-y-2">
                   {opponent.replay_analysis.aggression_rating !== null && (
                     <div className="flex justify-between">
-                      <span className="text-slate-300">Агрессия:</span>
+                      <span 
+                        className="text-slate-300 cursor-help" 
+                        title="Скорость атак: 90%+ = раш, 70% = тайминги, 50% = сбалансированно, 30% = пассивно"
+                      >
+                        Агрессия:
+                      </span>
                       <div className="flex items-center gap-1">
                         <div className="w-12 h-1 bg-slate-600 rounded">
                           <div 
@@ -560,7 +565,12 @@ function App() {
                   
                   {opponent.replay_analysis.economy_rating !== null && (
                     <div className="flex justify-between">
-                      <span className="text-slate-300">Экономика:</span>
+                      <span 
+                        className="text-slate-300 cursor-help" 
+                        title="Эффективность экономики: 90%+ = отличная, 70% = хорошая, 50% = средняя, <50% = слабая"
+                      >
+                        Экономика:
+                      </span>
                       <div className="flex items-center gap-1">
                         <div className="w-12 h-1 bg-slate-600 rounded">
                           <div 
