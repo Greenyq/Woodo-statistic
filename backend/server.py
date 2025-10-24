@@ -1391,6 +1391,12 @@ async def get_demo_match():
         # Analyze replays for strategic insights
         replay_analysis = await analyze_player_replays(demo_battle_tag)
         
+        # Analyze unit composition
+        unit_analysis = analyze_unit_composition_vs_race(
+            opponent_hero_stats,
+            "Night Elf"  # Siberia is Night Elf
+        )
+        
         demo_match_data = {
             "status": "in_game",
             "message": f"Demo match found! Player DemoPlayer#1234 vs {demo_battle_tag}",
