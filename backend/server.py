@@ -1125,6 +1125,29 @@ async def get_demo_match():
         logging.error(f"Error getting demo match: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Error getting demo match: {str(e)}")
 
+@api_router.get("/replay-analysis/{battle_tag}")
+async def get_replay_analysis(battle_tag: str):
+    """Get replay analysis for a player"""
+    try:
+        replay_stats = await analyze_player_replays(battle_tag)
+        
+        if not replay_stats:
+            return {
+                "battle_tag": battle_tag,
+                "analysis": None,
+                "message": "No replay analysis available"
+            }
+        
+        return {
+            "battle_tag": battle_tag,
+            "analysis": replay_stats.dict(),
+            "message": "Replay analysis completed"
+        }
+        
+    except Exception as e:
+        logging.error(f"Error getting replay analysis for {battle_tag}: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error getting replay analysis: {str(e)}")
+
 # Include the router in the main app
 app.include_router(api_router)
 
