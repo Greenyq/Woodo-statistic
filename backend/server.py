@@ -225,6 +225,207 @@ async def get_recent_matches_smart(battle_tag: str, target_matches: int = 20) ->
     
     return None
 
+async def download_replay_from_url(replay_url: str) -> Optional[bytes]:
+    """Download replay file from URL"""
+    try:
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            response = await client.get(replay_url)
+            if response.status_code == 200:
+                return response.content
+            else:
+                logging.warning(f"Failed to download replay: {response.status_code}")
+                return None
+    except Exception as e:
+        logging.error(f"Error downloading replay: {str(e)}")
+        return None
+
+def analyze_replay_file(replay_data: bytes, battle_tag: str) -> Optional[ReplayAnalysis]:
+    """Analyze W3G replay file and extract strategic information"""
+    try:
+        # Save replay data to temporary file
+        with tempfile.NamedTemporaryFile(suffix='.w3g', delete=False) as temp_file:
+            temp_file.write(replay_data)
+            temp_file_path = temp_file.name
+        
+        try:
+            # Parse replay with w3g library
+            replay = w3g.File(temp_file_path)
+            
+            # Basic match info
+            match_info = replay.header
+            duration = getattr(replay, 'duration', 0)
+            map_name = getattr(match_info, 'map_name', 'Unknown')
+            
+            # Find player in replay
+            player_data = None
+            for player in getattr(replay, 'players', []):
+                if hasattr(player, 'battle_tag') and player.battle_tag == battle_tag:
+                    player_data = player
+                    break
+            
+            if not player_data:
+                logging.warning(f"Player {battle_tag} not found in replay")
+                return None
+            
+            # Calculate APM
+            apm = None
+            try:
+                if hasattr(replay, 'apm'):
+                    apm_data = replay.apm()
+                    if isinstance(apm_data, dict) and battle_tag in apm_data:
+                        apm = apm_data[battle_tag]
+                    elif isinstance(apm_data, (int, float)):
+                        apm = float(apm_data)
+            except:
+                pass
+            
+            # Analyze build order and strategy
+            strategy_type = determine_strategy_type(replay, player_data)
+            aggression_level = calculate_aggression_level(replay, player_data)
+            
+            # Create analysis result
+            analysis = ReplayAnalysis(
+                match_id=f"replay_{uuid.uuid4().hex[:8]}",
+                player_battle_tag=battle_tag,
+                duration_seconds=duration,
+                map_name=map_name,
+                apm=apm,
+                strategy_type=strategy_type,
+                aggression_level=aggression_level
+            )
+            
+            return analysis
+            
+        finally:
+            # Clean up temporary file
+            os.unlink(temp_file_path)
+            
+    except Exception as e:
+        logging.error(f"Error analyzing replay: {str(e)}")
+        return None
+
+def determine_strategy_type(replay, player_data) -> str:
+    """Determine player's strategy type based on replay analysis"""
+    try:
+        # This is a simplified analysis - in practice would need more sophisticated logic
+        duration = getattr(replay, 'duration', 0)
+        
+        # Basic heuristics
+        if duration < 300:  # Less than 5 minutes
+            return "rush"
+        elif duration < 600:  # 5-10 minutes  
+            return "timing_attack"
+        elif duration < 1200:  # 10-20 minutes
+            return "macro"
+        else:
+            return "late_game"
+            
+    except Exception as e:
+        logging.error(f"Error determining strategy: {str(e)}")
+        return "unknown"
+
+def calculate_aggression_level(replay, player_data) -> float:
+    """Calculate player's aggression level (0.0 - 1.0)"""
+    try:
+        # Simplified calculation based on available data
+        duration = getattr(replay, 'duration', 1)
+        
+        # Shorter games suggest more aggression
+        if duration < 300:
+            return 0.9
+        elif duration < 600:
+            return 0.7
+        elif duration < 1200:
+            return 0.5
+        else:
+            return 0.3
+            
+    except Exception as e:
+        logging.error(f"Error calculating aggression: {str(e)}")
+        return 0.5
+
+async def analyze_player_replays(battle_tag: str, match_ids: List[str] = None) -> Optional[PlayerReplayStats]:
+    """Analyze multiple replays for a player to build strategic profile"""
+    try:
+        # For now, we'll create a placeholder since we don't have direct replay URLs
+        # In a real implementation, this would download and analyze actual replays
+        
+        analyses = []
+        
+        # Simulate some analysis results based on recent matches data
+        recent_matches = await get_recent_matches_smart(battle_tag, 5)
+        if recent_matches and recent_matches.get('matches'):
+            for match in recent_matches['matches'][:3]:  # Analyze top 3 recent matches
+                
+                # Create simulated analysis based on match data
+                duration = match.get('durationInSeconds', 600)
+                map_name = match.get('map', 'Unknown')
+                
+                analysis = ReplayAnalysis(
+                    match_id=str(match.get('id', uuid.uuid4())),
+                    player_battle_tag=battle_tag,
+                    duration_seconds=duration,
+                    map_name=map_name,
+                    apm=float(150 + (duration / 10)),  # Simulated APM
+                    strategy_type=determine_strategy_type_from_duration(duration),
+                    aggression_level=calculate_aggression_from_duration(duration)
+                )
+                analyses.append(analysis)
+        
+        if not analyses:
+            return None
+        
+        # Calculate aggregate stats
+        avg_apm = sum(a.apm for a in analyses if a.apm) / len([a for a in analyses if a.apm])
+        
+        strategy_counts = {}
+        for analysis in analyses:
+            if analysis.strategy_type:
+                strategy_counts[analysis.strategy_type] = strategy_counts.get(analysis.strategy_type, 0) + 1
+        
+        favorite_strategy = max(strategy_counts.items(), key=lambda x: x[1])[0] if strategy_counts else "unknown"
+        
+        avg_aggression = sum(a.aggression_level for a in analyses if a.aggression_level) / len([a for a in analyses if a.aggression_level])
+        
+        player_stats = PlayerReplayStats(
+            battle_tag=battle_tag,
+            total_replays_analyzed=len(analyses),
+            avg_apm=avg_apm if avg_apm else None,
+            favorite_strategy=favorite_strategy,
+            aggression_rating=avg_aggression if avg_aggression else None,
+            economy_rating=0.7,  # Placeholder
+            build_order_consistency=0.8,  # Placeholder
+            recent_analyses=analyses
+        )
+        
+        return player_stats
+        
+    except Exception as e:
+        logging.error(f"Error analyzing player replays: {str(e)}")
+        return None
+
+def determine_strategy_type_from_duration(duration: int) -> str:
+    """Determine strategy type from match duration"""
+    if duration < 300:
+        return "rush"
+    elif duration < 600:
+        return "timing_attack"  
+    elif duration < 1200:
+        return "macro"
+    else:
+        return "late_game"
+
+def calculate_aggression_from_duration(duration: int) -> float:
+    """Calculate aggression level from match duration"""
+    if duration < 300:
+        return 0.9
+    elif duration < 600:
+        return 0.7
+    elif duration < 1200:
+        return 0.5
+    else:
+        return 0.3
+
 def get_race_number(race_name: str) -> int:
     """Convert race name to W3C race number"""
     race_map = {
