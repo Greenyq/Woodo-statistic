@@ -618,6 +618,410 @@ class W3ChampionsAPITester:
         
         return all_passed
 
+    def test_replay_analysis_endpoint(self):
+        """Test the new replay analysis endpoint"""
+        battle_tag = "Siberia#21832"
+        success, response = self.run_test(
+            "Replay Analysis Endpoint",
+            "GET",
+            f"replay-analysis/{battle_tag}",
+            200
+        )
+        
+        if success and response:
+            # Check response structure
+            expected_keys = ["battle_tag", "analysis", "message"]
+            if all(key in response for key in expected_keys):
+                print(f"   ✅ Response structure valid")
+                
+                # Check if analysis data is present
+                analysis = response.get("analysis")
+                if analysis:
+                    # Verify PlayerReplayStats structure
+                    required_fields = ["battle_tag", "total_replays_analyzed", "avg_apm", 
+                                     "favorite_strategy", "aggression_rating", "recent_analyses"]
+                    
+                    if all(field in analysis for field in required_fields):
+                        print(f"   ✅ PlayerReplayStats structure valid")
+                        
+                        # Check data quality
+                        total_replays = analysis.get("total_replays_analyzed", 0)
+                        avg_apm = analysis.get("avg_apm")
+                        favorite_strategy = analysis.get("favorite_strategy")
+                        aggression_rating = analysis.get("aggression_rating")
+                        
+                        print(f"   ✅ Analysis data: {total_replays} replays, APM: {avg_apm}, Strategy: {favorite_strategy}, Aggression: {aggression_rating}")
+                        
+                        # Verify recent analyses
+                        recent_analyses = analysis.get("recent_analyses", [])
+                        if recent_analyses:
+                            print(f"   ✅ Found {len(recent_analyses)} recent replay analyses")
+                            
+                            # Check ReplayAnalysis structure
+                            first_analysis = recent_analyses[0]
+                            replay_fields = ["match_id", "player_battle_tag", "duration_seconds", 
+                                           "strategy_type", "aggression_level", "apm"]
+                            
+                            if all(field in first_analysis for field in replay_fields):
+                                print(f"   ✅ ReplayAnalysis structure valid")
+                                return True
+                            else:
+                                print(f"   ❌ ReplayAnalysis missing required fields")
+                                return False
+                        else:
+                            print(f"   ⚠️  No recent analyses found")
+                            return True  # Still valid if no recent matches
+                    else:
+                        print(f"   ❌ PlayerReplayStats missing required fields")
+                        return False
+                else:
+                    print(f"   ℹ️  No analysis data (player may have no recent matches)")
+                    return True  # Valid response for players with no data
+            else:
+                print(f"   ❌ Response missing expected keys")
+                return False
+        
+        return success
+
+    def test_replay_analysis_functions(self):
+        """Test replay analysis helper functions through API responses"""
+        success, response = self.run_test(
+            "Replay Analysis Functions",
+            "GET",
+            "replay-analysis/Siberia#21832",
+            200
+        )
+        
+        if success and response:
+            analysis = response.get("analysis")
+            if analysis and analysis.get("recent_analyses"):
+                analyses = analysis["recent_analyses"]
+                
+                print(f"   Testing strategy type determination...")
+                strategy_types = set()
+                aggression_levels = []
+                
+                for replay_analysis in analyses:
+                    strategy_type = replay_analysis.get("strategy_type")
+                    aggression_level = replay_analysis.get("aggression_level")
+                    duration = replay_analysis.get("duration_seconds", 0)
+                    
+                    if strategy_type:
+                        strategy_types.add(strategy_type)
+                    
+                    if aggression_level is not None:
+                        aggression_levels.append(aggression_level)
+                    
+                    # Test strategy type logic
+                    expected_strategy = self._determine_expected_strategy(duration)
+                    if strategy_type == expected_strategy:
+                        print(f"   ✅ Strategy type correct for {duration}s: {strategy_type}")
+                    else:
+                        print(f"   ⚠️  Strategy type mismatch for {duration}s: got {strategy_type}, expected {expected_strategy}")
+                    
+                    # Test aggression level logic
+                    expected_aggression = self._calculate_expected_aggression(duration)
+                    if abs(aggression_level - expected_aggression) < 0.1:  # Allow small variance
+                        print(f"   ✅ Aggression level correct for {duration}s: {aggression_level}")
+                    else:
+                        print(f"   ⚠️  Aggression level mismatch for {duration}s: got {aggression_level}, expected {expected_aggression}")
+                
+                print(f"   ✅ Strategy types found: {list(strategy_types)}")
+                print(f"   ✅ Aggression levels range: {min(aggression_levels):.1f} - {max(aggression_levels):.1f}")
+                
+                # Verify strategy types are valid
+                valid_strategies = {"rush", "timing_attack", "macro", "late_game"}
+                invalid_strategies = strategy_types - valid_strategies
+                if not invalid_strategies:
+                    print(f"   ✅ All strategy types are valid")
+                    return True
+                else:
+                    print(f"   ❌ Invalid strategy types found: {invalid_strategies}")
+                    return False
+            else:
+                print(f"   ℹ️  No replay analyses to test functions with")
+                return True
+        
+        return success
+
+    def _determine_expected_strategy(self, duration):
+        """Helper to determine expected strategy based on duration"""
+        if duration < 300:
+            return "rush"
+        elif duration < 600:
+            return "timing_attack"
+        elif duration < 1200:
+            return "macro"
+        else:
+            return "late_game"
+
+    def _calculate_expected_aggression(self, duration):
+        """Helper to calculate expected aggression based on duration"""
+        if duration < 300:
+            return 0.9
+        elif duration < 600:
+            return 0.7
+        elif duration < 1200:
+            return 0.5
+        else:
+            return 0.3
+
+    def test_replay_analysis_integration_check_match(self):
+        """Test that replay analysis is integrated into check-match endpoint"""
+        test_data = {
+            "battle_tag": "Siberia#21832"
+        }
+        
+        success, response = self.run_test(
+            "Replay Analysis Integration - Check Match",
+            "POST",
+            "check-match",
+            200,
+            data=test_data
+        )
+        
+        if success and response:
+            status = response.get("status")
+            
+            if status == "in_game" and "data" in response:
+                opponent_data = response["data"].get("opponent_data", {})
+                opponents = opponent_data.get("opponents", [])
+                
+                if opponents:
+                    replay_analysis_found = False
+                    for opponent in opponents:
+                        if "replay_analysis" in opponent:
+                            replay_analysis = opponent["replay_analysis"]
+                            if replay_analysis:
+                                print(f"   ✅ Replay analysis found in opponent data")
+                                
+                                # Verify structure
+                                required_fields = ["battle_tag", "total_replays_analyzed", "favorite_strategy"]
+                                if all(field in replay_analysis for field in required_fields):
+                                    print(f"   ✅ Replay analysis structure valid")
+                                    
+                                    # Check strategic insights
+                                    strategy = replay_analysis.get("favorite_strategy")
+                                    apm = replay_analysis.get("avg_apm")
+                                    aggression = replay_analysis.get("aggression_rating")
+                                    
+                                    print(f"   ✅ Strategic insights: Strategy={strategy}, APM={apm}, Aggression={aggression}")
+                                    replay_analysis_found = True
+                                else:
+                                    print(f"   ❌ Replay analysis structure invalid")
+                                    return False
+                            else:
+                                print(f"   ℹ️  Replay analysis is null (no data available)")
+                                replay_analysis_found = True  # Still valid
+                    
+                    if replay_analysis_found:
+                        return True
+                    else:
+                        print(f"   ❌ No replay analysis found in any opponent")
+                        return False
+                else:
+                    print(f"   ℹ️  No opponents found (player not in match)")
+                    return True
+            elif status == "not_in_game":
+                print(f"   ℹ️  Player not in game - cannot test opponent replay analysis")
+                return True
+            else:
+                print(f"   ❌ Unexpected response structure")
+                return False
+        
+        return success
+
+    def test_replay_analysis_integration_demo_match(self):
+        """Test that replay analysis is integrated into demo-match endpoint"""
+        success, response = self.run_test(
+            "Replay Analysis Integration - Demo Match",
+            "GET",
+            "demo-match",
+            200
+        )
+        
+        if success and response:
+            opponents = response.get("data", {}).get("opponent_data", {}).get("opponents", [])
+            
+            if opponents:
+                opponent = opponents[0]
+                
+                # Check if replay_analysis field exists
+                if "replay_analysis" in opponent:
+                    replay_analysis = opponent["replay_analysis"]
+                    
+                    if replay_analysis:
+                        print(f"   ✅ Demo match includes replay analysis")
+                        
+                        # Verify it doesn't break existing functionality
+                        existing_fields = ["battle_tag", "race", "basic_stats", "achievements"]
+                        all_present = all(field in opponent for field in existing_fields)
+                        
+                        if all_present:
+                            print(f"   ✅ Existing functionality preserved")
+                            
+                            # Check strategic insights quality
+                            strategy = replay_analysis.get("favorite_strategy")
+                            apm = replay_analysis.get("avg_apm")
+                            aggression = replay_analysis.get("aggression_rating")
+                            
+                            # Validate data makes sense
+                            valid_data = True
+                            if apm and (apm < 50 or apm > 500):
+                                print(f"   ⚠️  APM seems unrealistic: {apm}")
+                                valid_data = False
+                            
+                            if aggression and (aggression < 0 or aggression > 1):
+                                print(f"   ⚠️  Aggression rating out of range: {aggression}")
+                                valid_data = False
+                            
+                            if strategy and strategy not in ["rush", "timing_attack", "macro", "late_game"]:
+                                print(f"   ⚠️  Invalid strategy type: {strategy}")
+                                valid_data = False
+                            
+                            if valid_data:
+                                print(f"   ✅ Strategic insights data quality good")
+                                return True
+                            else:
+                                print(f"   ❌ Strategic insights data quality issues")
+                                return False
+                        else:
+                            print(f"   ❌ Existing functionality broken")
+                            return False
+                    else:
+                        print(f"   ℹ️  Replay analysis is null (no data available)")
+                        return True
+                else:
+                    print(f"   ❌ Replay analysis field missing from demo match")
+                    return False
+            else:
+                print(f"   ❌ No opponents in demo match")
+                return False
+        
+        return success
+
+    def test_replay_analysis_data_quality(self):
+        """Test the quality of simulated replay analysis data"""
+        success, response = self.run_test(
+            "Replay Analysis Data Quality",
+            "GET",
+            "replay-analysis/Siberia#21832",
+            200
+        )
+        
+        if success and response:
+            analysis = response.get("analysis")
+            if analysis and analysis.get("recent_analyses"):
+                analyses = analysis["recent_analyses"]
+                
+                print(f"   Testing data quality for {len(analyses)} analyses...")
+                
+                # Test strategy type correlation with duration
+                strategy_duration_map = {}
+                for replay_analysis in analyses:
+                    strategy = replay_analysis.get("strategy_type")
+                    duration = replay_analysis.get("duration_seconds", 0)
+                    
+                    if strategy not in strategy_duration_map:
+                        strategy_duration_map[strategy] = []
+                    strategy_duration_map[strategy].append(duration)
+                
+                # Verify strategy types correlate with expected durations
+                correlation_good = True
+                for strategy, durations in strategy_duration_map.items():
+                    avg_duration = sum(durations) / len(durations)
+                    
+                    if strategy == "rush" and avg_duration > 600:
+                        print(f"   ⚠️  Rush strategy has high average duration: {avg_duration}s")
+                        correlation_good = False
+                    elif strategy == "late_game" and avg_duration < 900:
+                        print(f"   ⚠️  Late game strategy has low average duration: {avg_duration}s")
+                        correlation_good = False
+                    else:
+                        print(f"   ✅ {strategy} strategy duration correlation good: {avg_duration:.0f}s avg")
+                
+                # Test APM calculations
+                apms = [a.get("apm") for a in analyses if a.get("apm")]
+                if apms:
+                    avg_apm = sum(apms) / len(apms)
+                    min_apm = min(apms)
+                    max_apm = max(apms)
+                    
+                    # APM should be reasonable (50-400 range typically)
+                    if 50 <= avg_apm <= 400:
+                        print(f"   ✅ APM calculations reasonable: {avg_apm:.0f} avg ({min_apm:.0f}-{max_apm:.0f})")
+                    else:
+                        print(f"   ⚠️  APM calculations seem off: {avg_apm:.0f} avg")
+                        correlation_good = False
+                
+                # Test aggression correlation with game length
+                aggression_duration_pairs = [(a.get("aggression_level"), a.get("duration_seconds")) 
+                                           for a in analyses if a.get("aggression_level") is not None]
+                
+                if len(aggression_duration_pairs) > 1:
+                    # Check if shorter games generally have higher aggression
+                    short_games = [agg for agg, dur in aggression_duration_pairs if dur < 600]
+                    long_games = [agg for agg, dur in aggression_duration_pairs if dur > 1200]
+                    
+                    if short_games and long_games:
+                        avg_short_aggression = sum(short_games) / len(short_games)
+                        avg_long_aggression = sum(long_games) / len(long_games)
+                        
+                        if avg_short_aggression > avg_long_aggression:
+                            print(f"   ✅ Aggression correlation good: short games {avg_short_aggression:.2f} > long games {avg_long_aggression:.2f}")
+                        else:
+                            print(f"   ⚠️  Aggression correlation weak: short games {avg_short_aggression:.2f} vs long games {avg_long_aggression:.2f}")
+                            correlation_good = False
+                
+                return correlation_good
+            else:
+                print(f"   ℹ️  No replay analyses to test data quality")
+                return True
+        
+        return success
+
+    def test_replay_analysis_performance_impact(self):
+        """Test that replay analysis doesn't impact performance of existing endpoints"""
+        import time
+        
+        # Test check-match endpoint performance
+        start_time = time.time()
+        success1, _ = self.run_test(
+            "Performance Impact - Check Match",
+            "POST",
+            "check-match",
+            200,
+            data={"battle_tag": "Siberia#21832"}
+        )
+        check_match_time = time.time() - start_time
+        
+        # Test demo-match endpoint performance  
+        start_time = time.time()
+        success2, _ = self.run_test(
+            "Performance Impact - Demo Match",
+            "GET",
+            "demo-match",
+            200
+        )
+        demo_match_time = time.time() - start_time
+        
+        # Performance should be reasonable (under 30 seconds for external API calls)
+        performance_good = True
+        
+        if check_match_time > 30:
+            print(f"   ⚠️  Check-match endpoint slow: {check_match_time:.1f}s")
+            performance_good = False
+        else:
+            print(f"   ✅ Check-match performance good: {check_match_time:.1f}s")
+        
+        if demo_match_time > 30:
+            print(f"   ⚠️  Demo-match endpoint slow: {demo_match_time:.1f}s")
+            performance_good = False
+        else:
+            print(f"   ✅ Demo-match performance good: {demo_match_time:.1f}s")
+        
+        return success1 and success2 and performance_good
+
     def run_all_tests(self):
         """Run all backend tests"""
         print("🚀 Starting W3Champions Match Scout Backend Tests")
