@@ -14,7 +14,6 @@ from datetime import datetime, timezone
 import re
 import tempfile
 import w3g
-import os
 from urllib.parse import urljoin
 
 
