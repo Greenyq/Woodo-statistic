@@ -463,7 +463,7 @@ function App() {
           
           {/* Recent Performance */}
           {opponent.recent_matches?.matches && (
-            <div>
+            <div className="mb-3">
               <div className="text-xs text-slate-400 mb-2 font-semibold">⚡ Последние игры:</div>
               <div className="flex gap-1 flex-wrap">
                 {opponent.recent_matches.matches.slice(0, 8).map((match, idx) => {
@@ -497,6 +497,88 @@ function App() {
                     </Badge>
                   );
                 })}
+              </div>
+            </div>
+          )}
+          
+          {/* Replay Analysis */}
+          {opponent.replay_analysis && (
+            <div className="mt-3 p-3 rounded-lg bg-gradient-to-r from-purple-600/10 to-indigo-600/10 border border-purple-600/30">
+              <div className="text-xs text-slate-400 mb-2 font-semibold">📈 Анализ Реплеев:</div>
+              <div className="grid grid-cols-2 gap-3 text-xs">
+                {/* Strategy & APM */}
+                <div className="space-y-2">
+                  {opponent.replay_analysis.favorite_strategy && (
+                    <div className="flex justify-between">
+                      <span className="text-slate-300">Стратегия:</span>
+                      <Badge className={`text-xs ${
+                        opponent.replay_analysis.favorite_strategy === 'rush' ? 'bg-red-600/20 text-red-300' :
+                        opponent.replay_analysis.favorite_strategy === 'macro' ? 'bg-blue-600/20 text-blue-300' :
+                        opponent.replay_analysis.favorite_strategy === 'timing_attack' ? 'bg-orange-600/20 text-orange-300' :
+                        'bg-slate-600/20 text-slate-300'
+                      }`}>
+                        {opponent.replay_analysis.favorite_strategy === 'rush' ? '⚡ Раш' :
+                         opponent.replay_analysis.favorite_strategy === 'macro' ? '🏗️ Макро' :
+                         opponent.replay_analysis.favorite_strategy === 'timing_attack' ? '🎯 Тайминг' :
+                         opponent.replay_analysis.favorite_strategy === 'late_game' ? '🕒 Лейт' :
+                         opponent.replay_analysis.favorite_strategy}
+                      </Badge>
+                    </div>
+                  )}
+                  
+                  {opponent.replay_analysis.avg_apm && (
+                    <div className="flex justify-between">
+                      <span className="text-slate-300">APM:</span>
+                      <span className={`font-semibold ${
+                        opponent.replay_analysis.avg_apm >= 200 ? 'text-red-400' :
+                        opponent.replay_analysis.avg_apm >= 120 ? 'text-yellow-400' : 'text-green-400'
+                      }`}>
+                        {Math.round(opponent.replay_analysis.avg_apm)}
+                      </span>
+                    </div>
+                  )}
+                </div>
+                
+                {/* Ratings */}
+                <div className="space-y-2">
+                  {opponent.replay_analysis.aggression_rating !== null && (
+                    <div className="flex justify-between">
+                      <span className="text-slate-300">Агрессия:</span>
+                      <div className="flex items-center gap-1">
+                        <div className="w-12 h-1 bg-slate-600 rounded">
+                          <div 
+                            className="h-1 bg-gradient-to-r from-green-500 to-red-500 rounded"
+                            style={{width: `${(opponent.replay_analysis.aggression_rating || 0) * 100}%`}}
+                          />
+                        </div>
+                        <span className="text-xs text-slate-400">
+                          {Math.round((opponent.replay_analysis.aggression_rating || 0) * 100)}%
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {opponent.replay_analysis.economy_rating !== null && (
+                    <div className="flex justify-between">
+                      <span className="text-slate-300">Экономика:</span>
+                      <div className="flex items-center gap-1">
+                        <div className="w-12 h-1 bg-slate-600 rounded">
+                          <div 
+                            className="h-1 bg-gradient-to-r from-red-500 to-green-500 rounded"
+                            style={{width: `${(opponent.replay_analysis.economy_rating || 0) * 100}%`}}
+                          />
+                        </div>
+                        <span className="text-xs text-slate-400">
+                          {Math.round((opponent.replay_analysis.economy_rating || 0) * 100)}%
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+              
+              <div className="mt-2 text-xs text-slate-500">
+                Проанализировано реплеев: {opponent.replay_analysis.total_replays_analyzed || 0}
               </div>
             </div>
           )}
