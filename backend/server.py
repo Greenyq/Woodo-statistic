@@ -25,6 +25,21 @@ mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
 
+# Create database indexes for performance (run once on startup)
+async def create_database_indexes():
+    """Create indexes for better query performance"""
+    try:
+        # Index for match_statuses collection
+        await db.match_statuses.create_index("timestamp")
+        await db.match_statuses.create_index("battle_tag")
+        
+        # TTL index to auto-delete old records after 7 days
+        await db.match_statuses.create_index("timestamp", expireAfterSeconds=604800)
+        
+        logging.info("Database indexes created successfully")
+    except Exception as e:
+        logging.warning(f"Index creation warning: {str(e)}")  # Don't fail on index errors
+
 # Create the main app without a prefix
 app = FastAPI()
 
