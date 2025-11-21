@@ -1321,8 +1321,7 @@ async def check_player_match(player_input: PlayerInput):
                             "recent_matches": opponent_matches,
                             "hero_stats": opponent_hero_stats,
                             "achievements": opponent_achievements,
-                            "replay_analysis": replay_analysis.dict() if replay_analysis else None,
-                            "unit_analysis": unit_analysis
+                            "replay_analysis": replay_analysis.dict() if replay_analysis else None
                         })
         
         match_status = MatchStatus(
